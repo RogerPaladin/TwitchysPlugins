@@ -1,0 +1,252 @@
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Terraria;
+using TerrariaAPI;
+using TerrariaAPI.Hooks;
+using TShockAPI;
+using TShockAPI.DB;
+using MySql.Data.MySqlClient;
+using System.Threading;
+using System.ComponentModel;
+using System.IO;
+using System.Data;
+
+namespace HousingDistricts
+{
+    [APIVersion(1, 6)]
+    public class HousingDistricts : TerrariaPlugin
+    {
+        public static HConfigFile HConfig { get; set; }
+        public static SqlTableEditor SQLEditor;
+        public static SqlTableCreator SQLWriter;
+        public static List<House> Houses = new List<House>();
+        public static List<HPlayer> HPlayers = new List<HPlayer>();
+
+        public override string Name
+        {
+            get { return "HousingDistricts"; }
+        }
+        public override string Author
+        {
+            get { return "Created by Twitchy"; }
+        }
+        public override string Description
+        {
+            get { return ""; }
+        }
+        public override Version Version
+        {
+            get { return new Version(1, 1); }
+        }
+
+        public override void Initialize()
+        {
+            HTools.SetupConfig();
+
+            GameHooks.Initialize += OnInitialize;
+            GameHooks.Update += OnUpdate;
+            ServerHooks.Chat += OnChat;
+            NetHooks.GreetPlayer += OnGreetPlayer;
+            ServerHooks.Leave += OnLeave;
+            NetHooks.GetData += GetData;
+
+            GetDataHandlers.InitGetDataHandler();
+        }
+        public override void DeInitialize()
+        {
+            GameHooks.Initialize -= OnInitialize;
+            GameHooks.Update -= OnUpdate;
+            ServerHooks.Chat -= OnChat;
+            NetHooks.GreetPlayer -= OnGreetPlayer;
+            ServerHooks.Leave -= OnLeave;
+            NetHooks.GetData -= GetData;
+        }
+        public HousingDistricts(Main game)
+            : base(game)
+        {
+            HConfig = new HConfigFile();
+            Order = -1;
+        }
+
+        public void OnInitialize()
+        {
+            SQLEditor = new SqlTableEditor(TShock.DB, TShock.DB.GetSqlType() == SqlType.Sqlite ? (IQueryBuilder)new SqliteQueryCreator() : new MysqlQueryCreator());
+            SQLWriter = new SqlTableCreator(TShock.DB, TShock.DB.GetSqlType() == SqlType.Sqlite ? (IQueryBuilder)new SqliteQueryCreator() : new MysqlQueryCreator());
+
+            #region Setup
+            bool sethouse = false;
+            bool edithouse = false;
+
+            foreach (Group group in TShock.Groups.groups)
+            {
+                if (group.Name != "superadmin")
+                {
+                    if (group.HasPermission("sethouse"))
+                        sethouse = true;
+                    if (group.HasPermission("edithouse"))
+                        edithouse = true;
+                }
+            }
+            List<string> perm = new List<string>();
+            if (!sethouse)
+                perm.Add("sethouse");
+            if (!edithouse)
+                perm.Add("edithouse");
+            TShock.Groups.AddPermissions("trustedadmin", perm);
+
+            var table = new SqlTable("HousingDistrict",
+                new SqlColumn("ID", MySqlDbType.Int32) { Primary = true, AutoIncrement = true },
+                new SqlColumn("Name", MySqlDbType.Text) { Unique = true },
+                new SqlColumn("TopX", MySqlDbType.Int32),
+                new SqlColumn("TopY", MySqlDbType.Int32),
+                new SqlColumn("BottomX", MySqlDbType.Int32),
+                new SqlColumn("BottomY", MySqlDbType.Int32),
+                new SqlColumn("Owners", MySqlDbType.Text),
+                new SqlColumn("WorldID", MySqlDbType.Text)
+            );
+            SQLWriter.EnsureExists(table);
+
+            for (int i = 0; i < SQLEditor.ReadColumn("HousingDistrict", "ID", new List<SqlValue>()).Count; i++)
+            {
+                string[] list = SQLEditor.ReadColumn("HousingDistrict", "Owners", new List<SqlValue>())[i].ToString().Split(',');
+                List<string> items = new List<string>();
+
+                foreach (string item in list)
+                {
+                    items.Add(item);
+                }
+
+                Houses.Add(new House(
+                    new Rectangle(
+                    (int)SQLEditor.ReadColumn("HousingDistrict", "TopX", new List<SqlValue>())[i],
+                    (int)SQLEditor.ReadColumn("HousingDistrict", "TopY", new List<SqlValue>())[i],
+                    (int)SQLEditor.ReadColumn("HousingDistrict", "BottomX", new List<SqlValue>())[i],
+                    (int)SQLEditor.ReadColumn("HousingDistrict", "BottomY", new List<SqlValue>())[i]),
+                    items,
+                    (int)SQLEditor.ReadColumn("HousingDistrict", "ID", new List<SqlValue>())[i],
+                    (string)SQLEditor.ReadColumn("HousingDistrict", "Name", new List<SqlValue>())[i],
+                    (string)SQLEditor.ReadColumn("HousingDistrict", "WorldID", new List<SqlValue>())[i]));
+            }
+            #endregion
+
+            #region Commands
+            Commands.ChatCommands.Add(new Command("sethouse", HCommands.House, "house"));
+            Commands.ChatCommands.Add(new Command("superadmin", HCommands.Convert, "converthouse"));
+            Commands.ChatCommands.Add(new Command(HCommands.TellAll, "all"));
+            #endregion
+        }
+
+        public void OnUpdate(GameTime gametime)
+        {
+            foreach (HPlayer player in HPlayers)
+            {
+                int HousesNotIn = 0;
+                foreach (House house in HousingDistricts.Houses)
+                {
+                    if (HConfig.NotifyOnEntry)
+                    {
+                        if (house.HouseArea.Intersects(new Rectangle(player.TSPlayer.TileX, player.TSPlayer.TileY, 1, 1)) && house.WorldID == Main.worldID.ToString())
+                        {
+                            if (player.CurHouse != house.Name)
+                            {
+                                player.CurHouse = house.Name;
+                                player.InHouse = true;
+
+                                if (HTools.OwnsHouse(player.TSPlayer.UserID.ToString(), player.CurHouse))
+                                    player.TSPlayer.SendMessage("Entered your house: '" + house.Name + "'", Color.MediumPurple);
+                                else
+                                {
+                                    player.TSPlayer.SendMessage("Entered the house: '" + house.Name + "'", Color.MediumPurple);
+                                    HTools.BroadcastToHouseOwners(player.CurHouse, "'" + player.TSPlayer.Name + "' Entered your house: " + player.CurHouse);
+                                }
+                            }
+                        }
+                        else
+                            HousesNotIn++;
+                    }
+                }
+
+                if (HConfig.NotifyOnExit)
+                {
+                    if (HousesNotIn == HousingDistricts.Houses.Count && player.InHouse)
+                    {
+                        if (HTools.OwnsHouse(player.TSPlayer.UserID.ToString(), player.CurHouse))
+                            player.TSPlayer.SendMessage("Left your house: '" + player.CurHouse + "'", Color.MediumPurple);
+                        else
+                        {
+                            player.TSPlayer.SendMessage("Left house: '" + player.CurHouse + "'", Color.MediumPurple);
+                            HTools.BroadcastToHouseOwners(player.CurHouse, "'" + player.TSPlayer.Name + "' Left your house: " + player.CurHouse);
+                        }
+                        player.CurHouse = "";
+                        player.InHouse = false;
+                    }
+                }
+            }
+        }
+
+        public void OnChat(messageBuffer msg, int ply, string text, HandledEventArgs e)
+        {
+            if (text[0] == '/')
+                return;
+
+            var tsplr = TShock.Players[msg.whoAmI];
+            
+            foreach (House house in HousingDistricts.Houses)
+            {
+                if (house.HouseArea.Intersects(new Rectangle(tsplr.TileX, tsplr.TileY, 1, 1)) && house.WorldID == Main.worldID.ToString())
+                {
+                    HTools.BroadcastToHouse(house.ID, text, tsplr.Name);
+                    e.Handled = true;
+                }
+            }
+        }
+
+        public void OnGreetPlayer(int who, HandledEventArgs e)
+        {
+            HPlayers.Add(new HPlayer(who));
+        }
+
+        public void OnLeave(int ply)
+        {
+            foreach (HPlayer player in HPlayers)
+            {
+                if (player.Index == ply)
+                {
+                    HPlayers.Remove(player);
+                    break;
+                }
+            }
+        }
+
+        private void GetData(GetDataEventArgs e)
+        {
+            PacketTypes type = e.MsgID;
+            var player = TShock.Players[e.Msg.whoAmI];
+            if (player == null)
+            {
+                e.Handled = true;
+                return;
+            }
+
+            if (!player.ConnectionAlive)
+            {
+                e.Handled = true;
+                return;
+            }
+
+            using (var data = new MemoryStream(e.Msg.readBuffer, e.Index, e.Length))
+            {
+                try
+                {
+                    if (GetDataHandlers.HandlerGetData(type, player, data))
+                        e.Handled = true;
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex.ToString());
+                }
+            }
+        }
+    }
+}
