@@ -1,0 +1,25 @@
+C:\Users\Playtech\Desktop\TShock\C3\C3Mod\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Playtech\Desktop\TShock\C3\C3Mod\bin\Debug\C3Mod Plugin.dll
+C:\Users\Playtech\Desktop\TShock\C3\C3Mod\bin\Debug\C3Mod Plugin.pdb
+C:\Users\Playtech\Desktop\TShock\C3\C3Mod\bin\Debug\Community.CsharpSqlite.dll
+C:\Users\Playtech\Desktop\TShock\C3\C3Mod\bin\Debug\Community.CsharpSqlite.SQLiteClient.dll
+C:\Users\Playtech\Desktop\TShock\C3\C3Mod\bin\Debug\MySql.Data.dll
+C:\Users\Playtech\Desktop\TShock\C3\C3Mod\bin\Debug\MySql.Web.dll
+C:\Users\Playtech\Desktop\TShock\C3\C3Mod\bin\Debug\TerrariaServer.exe
+C:\Users\Playtech\Desktop\TShock\C3\C3Mod\bin\Debug\TerrariaServerAPI.dll
+C:\Users\Playtech\Desktop\TShock\C3\C3Mod\bin\Debug\TShockAPI.dll
+C:\Users\Playtech\Desktop\TShock\C3\C3Mod\bin\Debug\XNAHelpers.dll
+C:\Users\Playtech\Desktop\TShock\C3\C3Mod\obj\Debug\C3Mod Plugin.dll
+C:\Users\Playtech\Desktop\TShock\C3\C3Mod\obj\Debug\C3Mod Plugin.pdb
+C:\Users\Public\Documents\C3Mod\TShock C3Mod Plugin\C3Mod\bin\Debug\C3Mod Plugin.dll
+C:\Users\Public\Documents\C3Mod\TShock C3Mod Plugin\C3Mod\bin\Debug\C3Mod Plugin.pdb
+C:\Users\Public\Documents\C3Mod\TShock C3Mod Plugin\C3Mod\bin\Debug\Community.CsharpSqlite.dll
+C:\Users\Public\Documents\C3Mod\TShock C3Mod Plugin\C3Mod\bin\Debug\Community.CsharpSqlite.SQLiteClient.dll
+C:\Users\Public\Documents\C3Mod\TShock C3Mod Plugin\C3Mod\bin\Debug\TerrariaServer.exe
+C:\Users\Public\Documents\C3Mod\TShock C3Mod Plugin\C3Mod\bin\Debug\TerrariaServerAPI.dll
+C:\Users\Public\Documents\C3Mod\TShock C3Mod Plugin\C3Mod\bin\Debug\TShockAPI.dll
+C:\Users\Public\Documents\C3Mod\TShock C3Mod Plugin\C3Mod\bin\Debug\XNAHelpers.dll
+C:\Users\Public\Documents\C3Mod\TShock C3Mod Plugin\C3Mod\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Public\Documents\C3Mod\TShock C3Mod Plugin\C3Mod\obj\Debug\C3Mod Plugin.dll
+C:\Users\Public\Documents\C3Mod\TShock C3Mod Plugin\C3Mod\obj\Debug\C3Mod Plugin.pdb
+C:\Users\Public\Documents\C3Mod\TShock C3Mod Plugin\C3Mod\bin\Debug\Newtonsoft.Json.dll
