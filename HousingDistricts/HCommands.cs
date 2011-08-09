@@ -216,7 +216,7 @@ namespace HousingDistricts
 
                         //Add up to pagelimit names to a list
                         var nameslist = new List<string>();
-                        for (int i = 0; i < pagelimit && i + (page * pagelimit) < houses.Count; i++)
+                        for (int i = (page * pagelimit); (i < ((page * pagelimit) + pagelimit)) && i < houses.Count; i++)
                         {
                             nameslist.Add(houses[i].Name);
                         }
@@ -230,7 +230,7 @@ namespace HousingDistricts
 
                         if (page < pagecount)
                         {
-                            args.Player.SendMessage(string.Format("Type /house list {0} for more houses.", (page + 1)), Color.Yellow);
+                            args.Player.SendMessage(string.Format("Type /house list {0} for more houses.", (page + 2)), Color.Yellow);
                         }
                         break;
                     }
