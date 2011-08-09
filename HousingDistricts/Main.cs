@@ -77,7 +77,7 @@ namespace HousingDistricts
             #region Setup
             bool sethouse = false;
             bool edithouse = false;
-            bool changelock = false;
+            bool enterlocked = false;
 
             foreach (Group group in TShock.Groups.groups)
             {
@@ -87,8 +87,8 @@ namespace HousingDistricts
                         sethouse = true;
                     if (group.HasPermission("edithouse"))
                         edithouse = true;
-                    if (group.HasPermission("changelock"))
-                        changelock = true;
+                    if (group.HasPermission("enterlocked"))
+                        enterlocked = true;
                 }
             }
             List<string> perm = new List<string>();
@@ -96,8 +96,8 @@ namespace HousingDistricts
                 perm.Add("sethouse");
             if (!edithouse)
                 perm.Add("edithouse");
-            if (!changelock)
-                perm.Add("changelock");
+            if (!enterlocked)
+                perm.Add("enterlocked");
             TShock.Groups.AddPermissions("trustedadmin", perm);
 
             var table = new SqlTable("HousingDistrict",
@@ -147,7 +147,7 @@ namespace HousingDistricts
             #region Commands
             Commands.ChatCommands.Add(new Command("sethouse", HCommands.House, "house"));
             Commands.ChatCommands.Add(new Command("superadmin", HCommands.Convert, "converthouse"));
-            Commands.ChatCommands.Add(new Command("changelock", HCommands.ChangeLock, "changelock"));
+            Commands.ChatCommands.Add(new Command(HCommands.ChangeLock, "changelock"));
             Commands.ChatCommands.Add(new Command(HCommands.TellAll, "all"));
             #endregion
         }
@@ -163,7 +163,7 @@ namespace HousingDistricts
                     {
                         if (house.HouseArea.Intersects(new Rectangle(player.TSPlayer.TileX, player.TSPlayer.TileY, 1, 1)) && house.WorldID == Main.worldID.ToString())
                         {
-                            if (house.Locked == 1)
+                            if (house.Locked == 1 && !player.TSPlayer.Group.HasPermission("enterlocked"))
                             {
                                 if (!HTools.OwnsHouse(player.TSPlayer.UserID.ToString(), house.Name))
                                 {

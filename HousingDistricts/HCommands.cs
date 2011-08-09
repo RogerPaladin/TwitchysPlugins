@@ -291,12 +291,17 @@ namespace HousingDistricts
                     }
                 }
 
-                bool locked = HouseTools.ChangeLock(houseName);
+                if (HTools.OwnsHouse(args.Player.UserID.ToString(), houseName))
+                {
+                    bool locked = HouseTools.ChangeLock(houseName);
 
-                if (locked)
-                    args.Player.SendMessage("House: " + houseName + " locked", Color.Yellow);
+                    if (locked)
+                        args.Player.SendMessage("House: " + houseName + " locked", Color.Yellow);
+                    else
+                        args.Player.SendMessage("House: " + houseName + " unlocked", Color.Yellow);
+                }
                 else
-                    args.Player.SendMessage("House: " + houseName + " unlocked", Color.Yellow);
+                    args.Player.SendMessage("You do not own House: " + houseName, Color.Yellow);
             }
             else
                 args.Player.SendMessage("Invalid syntax! Proper syntax: /changelock [house]", Color.Red);
