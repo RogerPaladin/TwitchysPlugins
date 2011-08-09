@@ -215,7 +215,7 @@ namespace C3Mod
                             {
                                 if (TDM.TDMSpawns[0] != Vector2.Zero && TDM.TDMSpawns[1] != Vector2.Zero)
                                 {
-                                    C3Tools.BroadcastMessageToGametype("", "Vote to play Team Deathmax started by: " + args.Player.Name, Color.Cyan);
+                                    C3Tools.BroadcastMessageToGametype("", "Vote to play Team Deathmatch started by: " + args.Player.Name, Color.Cyan);
                                     C3Tools.BroadcastMessageToGametype("", "Type /join to join the lobby for this game!", Color.Cyan);
                                     TDM.BlueTeamScore = 0;
                                     TDM.RedTeamScore = 0;
