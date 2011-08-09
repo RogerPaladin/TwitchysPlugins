@@ -11,3 +11,15 @@ C:\Users\Steven French\documents\visual studio 2010\Projects\HousingDistricts\Ho
 C:\Users\Steven French\documents\visual studio 2010\Projects\HousingDistricts\HousingDistricts\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\Users\Steven French\documents\visual studio 2010\Projects\HousingDistricts\HousingDistricts\obj\x86\Debug\HousingDistricts.dll
 C:\Users\Steven French\documents\visual studio 2010\Projects\HousingDistricts\HousingDistricts\obj\x86\Debug\HousingDistricts.pdb
+C:\Users\Public\Documents\C3Mod\TShockPlugins\HousingDistricts\bin\Debug\HousingDistricts.dll.config
+C:\Users\Public\Documents\C3Mod\TShockPlugins\HousingDistricts\bin\Debug\HousingDistricts.dll
+C:\Users\Public\Documents\C3Mod\TShockPlugins\HousingDistricts\bin\Debug\HousingDistricts.pdb
+C:\Users\Public\Documents\C3Mod\TShockPlugins\HousingDistricts\bin\Debug\Community.CsharpSqlite.dll
+C:\Users\Public\Documents\C3Mod\TShockPlugins\HousingDistricts\bin\Debug\Community.CsharpSqlite.SQLiteClient.dll
+C:\Users\Public\Documents\C3Mod\TShockPlugins\HousingDistricts\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Public\Documents\C3Mod\TShockPlugins\HousingDistricts\bin\Debug\TerrariaServer.exe
+C:\Users\Public\Documents\C3Mod\TShockPlugins\HousingDistricts\bin\Debug\TerrariaServerAPI.dll
+C:\Users\Public\Documents\C3Mod\TShockPlugins\HousingDistricts\bin\Debug\XNAHelpers.dll
+C:\Users\Public\Documents\C3Mod\TShockPlugins\HousingDistricts\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Public\Documents\C3Mod\TShockPlugins\HousingDistricts\obj\x86\Debug\HousingDistricts.dll
+C:\Users\Public\Documents\C3Mod\TShockPlugins\HousingDistricts\obj\x86\Debug\HousingDistricts.pdb

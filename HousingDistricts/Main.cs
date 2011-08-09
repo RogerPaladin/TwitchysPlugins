@@ -77,6 +77,7 @@ namespace HousingDistricts
             #region Setup
             bool sethouse = false;
             bool edithouse = false;
+            bool changelock = false;
 
             foreach (Group group in TShock.Groups.groups)
             {
@@ -86,6 +87,8 @@ namespace HousingDistricts
                         sethouse = true;
                     if (group.HasPermission("edithouse"))
                         edithouse = true;
+                    if (group.HasPermission("changelock"))
+                        changelock = true;
                 }
             }
             List<string> perm = new List<string>();
@@ -93,6 +96,8 @@ namespace HousingDistricts
                 perm.Add("sethouse");
             if (!edithouse)
                 perm.Add("edithouse");
+            if (!changelock)
+                perm.Add("changelock");
             TShock.Groups.AddPermissions("trustedadmin", perm);
 
             var table = new SqlTable("HousingDistrict",
@@ -103,7 +108,8 @@ namespace HousingDistricts
                 new SqlColumn("BottomX", MySqlDbType.Int32),
                 new SqlColumn("BottomY", MySqlDbType.Int32),
                 new SqlColumn("Owners", MySqlDbType.Text),
-                new SqlColumn("WorldID", MySqlDbType.Text)
+                new SqlColumn("WorldID", MySqlDbType.Text),
+                new SqlColumn("Locked", MySqlDbType.Int32)
             );
             SQLWriter.EnsureExists(table);
 
@@ -117,6 +123,13 @@ namespace HousingDistricts
                     items.Add(item);
                 }
 
+                int locked = 0;
+
+                if (SQLEditor.ReadColumn("HousingDistrict", "Locked", new List<SqlValue>())[i] != null)
+                {
+                    locked = (int)SQLEditor.ReadColumn("HousingDistrict", "Locked", new List<SqlValue>())[i];
+                }
+
                 Houses.Add(new House(
                     new Rectangle(
                     (int)SQLEditor.ReadColumn("HousingDistrict", "TopX", new List<SqlValue>())[i],
@@ -126,13 +139,15 @@ namespace HousingDistricts
                     items,
                     (int)SQLEditor.ReadColumn("HousingDistrict", "ID", new List<SqlValue>())[i],
                     (string)SQLEditor.ReadColumn("HousingDistrict", "Name", new List<SqlValue>())[i],
-                    (string)SQLEditor.ReadColumn("HousingDistrict", "WorldID", new List<SqlValue>())[i]));
+                    (string)SQLEditor.ReadColumn("HousingDistrict", "WorldID", new List<SqlValue>())[i],
+                    locked));
             }
             #endregion
 
             #region Commands
             Commands.ChatCommands.Add(new Command("sethouse", HCommands.House, "house"));
             Commands.ChatCommands.Add(new Command("superadmin", HCommands.Convert, "converthouse"));
+            Commands.ChatCommands.Add(new Command("changelock", HCommands.ChangeLock, "changelock"));
             Commands.ChatCommands.Add(new Command(HCommands.TellAll, "all"));
             #endregion
         }
@@ -148,17 +163,28 @@ namespace HousingDistricts
                     {
                         if (house.HouseArea.Intersects(new Rectangle(player.TSPlayer.TileX, player.TSPlayer.TileY, 1, 1)) && house.WorldID == Main.worldID.ToString())
                         {
-                            if (player.CurHouse != house.Name)
+                            if (house.Locked == 1)
                             {
-                                player.CurHouse = house.Name;
-                                player.InHouse = true;
-
-                                if (HTools.OwnsHouse(player.TSPlayer.UserID.ToString(), player.CurHouse))
-                                    player.TSPlayer.SendMessage("Entered your house: '" + house.Name + "'", Color.MediumPurple);
-                                else
+                                if (!HTools.OwnsHouse(player.TSPlayer.UserID.ToString(), house.Name))
                                 {
-                                    player.TSPlayer.SendMessage("Entered the house: '" + house.Name + "'", Color.MediumPurple);
-                                    HTools.BroadcastToHouseOwners(player.CurHouse, "'" + player.TSPlayer.Name + "' Entered your house: " + player.CurHouse);
+                                    player.TSPlayer.Teleport((int)player.LastTilePos.X, (int)player.LastTilePos.Y + 3);
+                                    player.TSPlayer.SendMessage("House: '" + house.Name + "' Is locked", Color.MediumPurple);
+                                }
+                            }
+                            else
+                            {
+                                if (player.CurHouse != house.Name)
+                                {
+                                    player.CurHouse = house.Name;
+                                    player.InHouse = true;
+
+                                    if (HTools.OwnsHouse(player.TSPlayer.UserID.ToString(), player.CurHouse))
+                                        player.TSPlayer.SendMessage("Entered your house: '" + house.Name + "'", Color.MediumPurple);
+                                    else
+                                    {
+                                        player.TSPlayer.SendMessage("Entered the house: '" + house.Name + "'", Color.MediumPurple);
+                                        HTools.BroadcastToHouseOwners(player.CurHouse, "'" + player.TSPlayer.Name + "' Entered your house: " + player.CurHouse);
+                                    }
                                 }
                             }
                         }
@@ -182,6 +208,7 @@ namespace HousingDistricts
                         player.InHouse = false;
                     }
                 }
+                player.LastTilePos = new Vector2(player.TSPlayer.TileX, player.TSPlayer.TileY);
             }
         }
 
@@ -204,7 +231,7 @@ namespace HousingDistricts
 
         public void OnGreetPlayer(int who, HandledEventArgs e)
         {
-            HPlayers.Add(new HPlayer(who));
+            HPlayers.Add(new HPlayer(who, new Vector2(TShock.Players[who].TileX,TShock.Players[who].TileY)));
         }
 
         public void OnLeave(int ply)

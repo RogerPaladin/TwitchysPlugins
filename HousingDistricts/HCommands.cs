@@ -69,7 +69,7 @@ namespace HousingDistricts
 
 
                                 if (HouseTools.AddHouse(args.Player.TempArea.X, args.Player.TempArea.Y,
-                                                            args.Player.TempArea.Width, args.Player.TempArea.Height, houseName))
+                                                            args.Player.TempArea.Width, args.Player.TempArea.Height, houseName, 0))
                                 {
                                     args.Player.TempArea = Rectangle.Empty;
                                     args.Player.SendMessage("Set house " + houseName, Color.Yellow);
@@ -271,6 +271,35 @@ namespace HousingDistricts
             {
                 house.WorldID = Main.worldID.ToString();
             }
+        }
+
+        public static void ChangeLock(CommandArgs args)
+        {
+            if (args.Parameters.Count > 0)
+            {
+                string houseName = "";
+
+                for (int i = 0; i < args.Parameters.Count; i++)
+                {
+                    if (houseName == "")
+                    {
+                        houseName = args.Parameters[i];
+                    }
+                    else
+                    {
+                        houseName = houseName + " " + args.Parameters[i];
+                    }
+                }
+
+                bool locked = HouseTools.ChangeLock(houseName);
+
+                if (locked)
+                    args.Player.SendMessage("House: " + houseName + " locked", Color.Yellow);
+                else
+                    args.Player.SendMessage("House: " + houseName + " unlocked", Color.Yellow);
+            }
+            else
+                args.Player.SendMessage("Invalid syntax! Proper syntax: /changelock [house]", Color.Red);
         }
     }
 }

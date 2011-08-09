@@ -16,20 +16,22 @@ namespace HousingDistricts
         public int ID { get; set; }
         public string Name { get; set; }
         public string WorldID { get; set; }
+        public int Locked { get; set; }
 
-        public House(Rectangle housearea, List<string> owners, int id, string name, string worldid)
+        public House(Rectangle housearea, List<string> owners, int id, string name, string worldid, int locked)
         {
             HouseArea = housearea;
             Owners = owners;
             ID = id;
             Name = name;
             WorldID = worldid;
+            Locked = locked;
         }
     }
 
     public class HouseTools
     {
-        public static bool AddHouse(int tx, int ty, int width, int height, string housename)
+        public static bool AddHouse(int tx, int ty, int width, int height, string housename, int locked)
         {
             List<SqlValue> values = new List<SqlValue>();
             values.Add(new SqlValue("Name", "'" + housename + "'"));
@@ -38,8 +40,10 @@ namespace HousingDistricts
             values.Add(new SqlValue("BottomX", width));
             values.Add(new SqlValue("BottomY", height));
             values.Add(new SqlValue("Owners", "0"));
+            values.Add(new SqlValue("WorldID", "'" + Main.worldID.ToString() + "'"));
+            values.Add(new SqlValue("Locked", locked));
             HousingDistricts.SQLEditor.InsertValues("HousingDistrict", values);
-            HousingDistricts.Houses.Add(new House(new Rectangle(tx, ty, width, height), new List<string>(), (HousingDistricts.Houses.Count + 1), housename, Main.worldID.ToString()));
+            HousingDistricts.Houses.Add(new House(new Rectangle(tx, ty, width, height), new List<string>(), (HousingDistricts.Houses.Count + 1), housename, Main.worldID.ToString(), locked));
             return true;
         }
 
@@ -63,8 +67,25 @@ namespace HousingDistricts
             wheres.Add(new SqlValue("Name", "'" + houseName + "'"));
 
             HousingDistricts.SQLEditor.UpdateValues("HousingDistrict", values, wheres);
-
             return true;
+        }
+
+        public static bool ChangeLock(string houseName)
+        {
+            var house = GetHouseByName(houseName);
+            bool locked = false;
+
+            if (house.Locked == 0)
+                locked = true;
+            else
+                locked = false;
+
+            house.Locked = locked ? 1 : 0;
+
+            List<SqlValue> values = new List<SqlValue>();
+            values.Add(new SqlValue("Locked", locked ? 1 : 0));
+            HousingDistricts.SQLEditor.UpdateValues("HousingDistrict", values, new List<SqlValue>());
+            return locked;
         }
 
         public static House GetHouseByName(string name)
