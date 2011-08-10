@@ -14,7 +14,7 @@ using System.Data;
 
 namespace HousingDistricts
 {
-    [APIVersion(1, 6)]
+    [APIVersion(1, 7)]
     public class HousingDistricts : TerrariaPlugin
     {
         public static HConfigFile HConfig { get; set; }

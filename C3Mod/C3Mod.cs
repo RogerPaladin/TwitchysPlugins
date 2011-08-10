@@ -16,7 +16,7 @@ using System.IO;
 
 namespace C3Mod
 {
-    [APIVersion(1, 6)]
+    [APIVersion(1, 7)]
     public class C3Mod : TerrariaPlugin
     {
         public static C3ConfigFile C3Config { get; set; }
