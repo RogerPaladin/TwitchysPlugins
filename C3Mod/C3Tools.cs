@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using System.IO;
 using TShockAPI;
@@ -252,6 +252,30 @@ namespace C3Mod
                     player.GameType = "";
                     player.Team = 0;
                 }
+            }
+        }
+
+        public static void RemovePlayer(object ply)
+        {
+            bool complete = false;
+
+            if (!C3Mod.UpdateLocked)
+            {
+                for (int i = 0; i < C3Mod.C3Players.Count; i++)
+                {
+                    if (C3Mod.C3Players[i].Index.ToString() == ply.ToString())
+                    {
+                        C3Mod.C3Players.RemoveAt(i);
+                        complete = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!complete)
+            {
+                Thread t = new Thread(RemovePlayer);
+                t.Start(ply);
             }
         }
     }

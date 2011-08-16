@@ -30,6 +30,8 @@ namespace C3Mod.GameTypes
 
         public static void OnUpdate(GameTime gameTime)
         {
+            C3Mod.UpdateLocked = true;
+
             if (C3Mod.VoteRunning && C3Mod.VoteType == "apoc")
             {
                 int VotedPlayers = 0;
@@ -93,7 +95,7 @@ namespace C3Mod.GameTypes
                         return;
                     }
                     else
-                        C3Tools.BroadcastMessageToGametype("apoc", "Vote to play Team Deathmatch failed, Not enough players", Color.DarkCyan);
+                        C3Tools.BroadcastMessageToGametype("apoc", "Vote to play Monster Apocalypse failed, Not enough players", Color.DarkCyan);
                 }
             }
 
@@ -330,6 +332,8 @@ namespace C3Mod.GameTypes
                     }
                 }
             }
+
+            C3Mod.UpdateLocked = false;
         }
 
         public static void SpawnMonsters()
@@ -354,6 +358,7 @@ namespace C3Mod.GameTypes
                     Main.npc[npcid].life = Main.npc[npcid].life * (Wave / 3) + 1;
                     MonsterWhoAmI.Add(Main.npc[npcid]);
                 }
+                MonstersLeft = amount;
             }
             else
             {

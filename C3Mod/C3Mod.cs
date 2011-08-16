@@ -27,6 +27,7 @@ namespace C3Mod
         public static SqlTableCreator SQLWriter;
         public static List<int> MonsterIDs = new List<int>();
         public static readonly Version VersionNum = Assembly.GetExecutingAssembly().GetName().Version;
+        public static bool UpdateLocked = false;
 
         public override string Name
         {
@@ -84,18 +85,6 @@ namespace C3Mod
             SQLWriter = new SqlTableCreator(TShock.DB, TShock.DB.GetSqlType() == SqlType.Sqlite ? (IQueryBuilder)new SqliteQueryCreator() : new MysqlQueryCreator());
 
             ApocalypseMonsters.AddNPCs();
-            
-            if (!File.Exists(TShock.SavePath + "/apocalypsemonsters.txt"))
-            {
-                File.Create(TShock.SavePath + "/apocalypsemonsters.txt");
-            }
-            else
-            {
-                foreach (string line in File.ReadAllLines(TShock.SavePath + "/apocalypsemonsters.txt"))
-                {
-                    MonsterIDs.Add(Int32.Parse(line));
-                }
-            }
 
             #region TestPerms
             //Checks to see if permissions have been moved around
@@ -335,35 +324,34 @@ namespace C3Mod
 
             #endregion
         }
+
         public void OnGreetPlayer(int who, HandledEventArgs e)
         {
             C3Players.Add(new C3Player(who));
             TShock.Players[who].SendMessage("This server is running C3Mod, created by Twitchy. Donate!", Color.Cyan);
         }
+
         public void OnUpdate(GameTime gametime)
         {
-            foreach (C3Player player in C3Mod.C3Players)
+            if (C3Config.RedAndBlueTeamsLocked)
             {
-                if (player.GameType == "")
+                foreach (C3Player player in C3Mod.C3Players)
                 {
-                    if (Main.player[player.Index].team == 1 || Main.player[player.Index].team == 3)
+                    if (player.GameType == "")
                     {
-                        player.SendMessage("This team is reserved for C3Mod, switching you to neutral", Color.DarkCyan);
-                        TShock.Players[player.Index].SetTeam(0);
+                        if (Main.player[player.Index].team == 1 || Main.player[player.Index].team == 3)
+                        {
+                            player.SendMessage("This team is reserved for C3Mod, switching you to neutral", Color.DarkCyan);
+                            TShock.Players[player.Index].SetTeam(0);
+                        }
                     }
                 }
             }
         }
+
         public void OnLeave(int ply)
         {
-            foreach (C3Player player in C3Mod.C3Players)
-            {
-                if (player.Index == ply)
-                {
-                    C3Players.Remove(player);
-                    break;
-                }
-            }
+            C3Tools.RemovePlayer(ply);
         }
     }
 }

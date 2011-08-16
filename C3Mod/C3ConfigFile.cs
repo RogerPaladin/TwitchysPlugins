@@ -37,6 +37,8 @@ namespace C3Mod
         public bool TeamDeathmatchEnabled = true;
         public bool MonsterApocalypseEnabled = true;
 
+        public bool RedAndBlueTeamsLocked = true;
+
         public static C3ConfigFile Read(string path)
         {
             if (!File.Exists(path))

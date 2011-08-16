@@ -22,6 +22,8 @@ namespace C3Mod.GameTypes
 
         public static void OnUpdate(GameTime gameTime)
         {
+            C3Mod.UpdateLocked = true;
+
             if (C3Mod.VoteRunning && C3Mod.VoteType == "tdm")
             {
                 int VotedPlayers = 0;
@@ -160,7 +162,7 @@ namespace C3Mod.GameTypes
                         if (!Main.player[player.Index].hostile)
                         {
                             Main.player[player.Index].hostile = true;
-                            NetMessage.SendData((int)PacketTypes.TogglePVP, -1, -1, "", player.Index, 0f, 0f, 0f);
+                            NetMessage.SendData((int)PacketTypes.TogglePvp, -1, -1, "", player.Index, 0f, 0f, 0f);
                         }
 
                         //Respawn on flag
@@ -218,6 +220,8 @@ namespace C3Mod.GameTypes
                     return;
                 }
             }
+
+            C3Mod.UpdateLocked = false;
         }        
 
         public static int TpToSpawnPoint()
