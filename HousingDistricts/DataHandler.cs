@@ -86,14 +86,17 @@ namespace HousingDistricts
 
             if (!args.Player.Group.HasPermission("edithouse"))
             {
-                foreach (House house in HousingDistricts.Houses)
+                lock (HousingDistricts.HPlayers)
                 {
-                    if (house.HouseArea.Intersects(new Rectangle(tilex, tiley, 1, 1)) && house.WorldID == Main.worldID.ToString())
+                    foreach (House house in HousingDistricts.Houses)
                     {
-                        if (!HTools.OwnsHouse(args.Player.UserID.ToString(), house.Name))
+                        if (house.HouseArea.Intersects(new Rectangle(tilex, tiley, 1, 1)) && house.WorldID == Main.worldID.ToString())
                         {
-                            args.Player.SendTileSquare(tilex, tiley);
-                            return true;
+                            if (!HTools.OwnsHouse(args.Player.UserID.ToString(), house.Name))
+                            {
+                                args.Player.SendTileSquare(tilex, tiley);
+                                return true;
+                            }
                         }
                     }
                 }
@@ -143,14 +146,17 @@ namespace HousingDistricts
 
             if (!args.Player.Group.HasPermission("edithouse"))
             {
-                foreach (House house in HousingDistricts.Houses)
+                lock (HousingDistricts.HPlayers)
                 {
-                    if (house.HouseArea.Intersects(new Rectangle(tilex, tiley, 1, 1)) && house.WorldID == Main.worldID.ToString())
+                    foreach (House house in HousingDistricts.Houses)
                     {
-                        if (!HTools.OwnsHouse(args.Player.UserID.ToString(), house.Name))
+                        if (house.HouseArea.Intersects(new Rectangle(tilex, tiley, 1, 1)) && house.WorldID == Main.worldID.ToString())
                         {
-                            args.Player.SendTileSquare(tilex, tiley);
-                            return true;
+                            if (!HTools.OwnsHouse(args.Player.UserID.ToString(), house.Name))
+                            {
+                                args.Player.SendTileSquare(tilex, tiley);
+                                return true;
+                            }
                         }
                     }
                 }
@@ -169,14 +175,17 @@ namespace HousingDistricts
 
             if (!args.Player.Group.HasPermission("edithouse"))
             {
-                foreach (House house in HousingDistricts.Houses)
+                lock (HousingDistricts.HPlayers)
                 {
-                    if (house.HouseArea.Intersects(new Rectangle(tilex, tiley, 1, 1)) && house.WorldID == Main.worldID.ToString())
+                    foreach (House house in HousingDistricts.Houses)
                     {
-                        if (!HTools.OwnsHouse(args.Player.UserID.ToString(), house.Name))
+                        if (house.HouseArea.Intersects(new Rectangle(tilex, tiley, 1, 1)) && house.WorldID == Main.worldID.ToString())
                         {
-                            args.Player.SendTileSquare(tilex, tiley);
-                            return true;
+                            if (!HTools.OwnsHouse(args.Player.UserID.ToString(), house.Name))
+                            {
+                                args.Player.SendTileSquare(tilex, tiley);
+                                return true;
+                            }
                         }
                     }
                 }
@@ -223,14 +232,17 @@ namespace HousingDistricts
 
             if (!args.Player.Group.HasPermission("edithouse"))
             {
-                foreach (House house in HousingDistricts.Houses)
+                lock (HousingDistricts.HPlayers)
                 {
-                    if (house.HouseArea.Intersects(new Rectangle(tilex, tiley, 1, 1)) && house.WorldID == Main.worldID.ToString())
+                    foreach (House house in HousingDistricts.Houses)
                     {
-                        if (!HTools.OwnsHouse(args.Player.UserID.ToString(), house.Name))
+                        if (house.HouseArea.Intersects(new Rectangle(tilex, tiley, 1, 1)) && house.WorldID == Main.worldID.ToString())
                         {
-                            args.Player.SendTileSquare(tilex, tiley);
-                            return true;
+                            if (!HTools.OwnsHouse(args.Player.UserID.ToString(), house.Name))
+                            {
+                                args.Player.SendTileSquare(tilex, tiley);
+                                return true;
+                            }
                         }
                     }
                 }

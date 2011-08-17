@@ -154,61 +154,64 @@ namespace HousingDistricts
 
         public void OnUpdate(GameTime gametime)
         {
-            foreach (HPlayer player in HPlayers)
+            lock (HPlayers)
             {
-                int HousesNotIn = 0;
-                foreach (House house in HousingDistricts.Houses)
+                foreach (HPlayer player in HPlayers)
                 {
-                    if (HConfig.NotifyOnEntry)
+                    int HousesNotIn = 0;
+                    foreach (House house in HousingDistricts.Houses)
                     {
-                        if (house.HouseArea.Intersects(new Rectangle(player.TSPlayer.TileX, player.TSPlayer.TileY, 1, 1)) && house.WorldID == Main.worldID.ToString())
+                        if (HConfig.NotifyOnEntry)
                         {
-                            if (house.Locked == 1 && !player.TSPlayer.Group.HasPermission("enterlocked"))
+                            if (house.HouseArea.Intersects(new Rectangle(player.TSPlayer.TileX, player.TSPlayer.TileY, 1, 1)) && house.WorldID == Main.worldID.ToString())
                             {
-                                if (!HTools.OwnsHouse(player.TSPlayer.UserID.ToString(), house.Name))
+                                if (house.Locked == 1 && !player.TSPlayer.Group.HasPermission("enterlocked"))
                                 {
-                                    player.TSPlayer.Teleport((int)player.LastTilePos.X, (int)player.LastTilePos.Y + 3);
-                                    player.TSPlayer.SendMessage("House: '" + house.Name + "' Is locked", Color.MediumPurple);
-                                }
-                            }
-                            else
-                            {
-                                if (player.CurHouse != house.Name)
-                                {
-                                    player.CurHouse = house.Name;
-                                    player.InHouse = true;
-
-                                    if (HTools.OwnsHouse(player.TSPlayer.UserID.ToString(), player.CurHouse))
-                                        player.TSPlayer.SendMessage("Entered your house: '" + house.Name + "'", Color.MediumPurple);
-                                    else
+                                    if (!HTools.OwnsHouse(player.TSPlayer.UserID.ToString(), house.Name))
                                     {
-                                        player.TSPlayer.SendMessage("Entered the house: '" + house.Name + "'", Color.MediumPurple);
-                                        HTools.BroadcastToHouseOwners(player.CurHouse, "'" + player.TSPlayer.Name + "' Entered your house: " + player.CurHouse);
+                                        player.TSPlayer.Teleport((int)player.LastTilePos.X, (int)player.LastTilePos.Y + 3);
+                                        player.TSPlayer.SendMessage("House: '" + house.Name + "' Is locked", Color.MediumPurple);
+                                    }
+                                }
+                                else
+                                {
+                                    if (player.CurHouse != house.Name)
+                                    {
+                                        player.CurHouse = house.Name;
+                                        player.InHouse = true;
+
+                                        if (HTools.OwnsHouse(player.TSPlayer.UserID.ToString(), player.CurHouse))
+                                            player.TSPlayer.SendMessage("Entered your house: '" + house.Name + "'", Color.MediumPurple);
+                                        else
+                                        {
+                                            player.TSPlayer.SendMessage("Entered the house: '" + house.Name + "'", Color.MediumPurple);
+                                            HTools.BroadcastToHouseOwners(player.CurHouse, "'" + player.TSPlayer.Name + "' Entered your house: " + player.CurHouse);
+                                        }
                                     }
                                 }
                             }
+                            else
+                                HousesNotIn++;
                         }
-                        else
-                            HousesNotIn++;
                     }
-                }
 
-                if (HConfig.NotifyOnExit)
-                {
-                    if (HousesNotIn == HousingDistricts.Houses.Count && player.InHouse)
+                    if (HConfig.NotifyOnExit)
                     {
-                        if (HTools.OwnsHouse(player.TSPlayer.UserID.ToString(), player.CurHouse))
-                            player.TSPlayer.SendMessage("Left your house: '" + player.CurHouse + "'", Color.MediumPurple);
-                        else
+                        if (HousesNotIn == HousingDistricts.Houses.Count && player.InHouse)
                         {
-                            player.TSPlayer.SendMessage("Left house: '" + player.CurHouse + "'", Color.MediumPurple);
-                            HTools.BroadcastToHouseOwners(player.CurHouse, "'" + player.TSPlayer.Name + "' Left your house: " + player.CurHouse);
+                            if (HTools.OwnsHouse(player.TSPlayer.UserID.ToString(), player.CurHouse))
+                                player.TSPlayer.SendMessage("Left your house: '" + player.CurHouse + "'", Color.MediumPurple);
+                            else
+                            {
+                                player.TSPlayer.SendMessage("Left house: '" + player.CurHouse + "'", Color.MediumPurple);
+                                HTools.BroadcastToHouseOwners(player.CurHouse, "'" + player.TSPlayer.Name + "' Left your house: " + player.CurHouse);
+                            }
+                            player.CurHouse = "";
+                            player.InHouse = false;
                         }
-                        player.CurHouse = "";
-                        player.InHouse = false;
                     }
+                    player.LastTilePos = new Vector2(player.TSPlayer.TileX, player.TSPlayer.TileY);
                 }
-                player.LastTilePos = new Vector2(player.TSPlayer.TileX, player.TSPlayer.TileY);
             }
         }
 
@@ -231,17 +234,21 @@ namespace HousingDistricts
 
         public void OnGreetPlayer(int who, HandledEventArgs e)
         {
-            HPlayers.Add(new HPlayer(who, new Vector2(TShock.Players[who].TileX,TShock.Players[who].TileY)));
+            lock (HPlayers)
+                HPlayers.Add(new HPlayer(who, new Vector2(TShock.Players[who].TileX, TShock.Players[who].TileY)));
         }
 
         public void OnLeave(int ply)
         {
-            foreach (HPlayer player in HPlayers)
+            lock (HPlayers)
             {
-                if (player.Index == ply)
+                for (int i = 0; i < HPlayers.Count; i++)
                 {
-                    HPlayers.Remove(player);
-                    break;
+                    if (HPlayers[i].Index == ply)
+                    {
+                        HPlayers.RemoveAt(i);
+                        break;
+                    }
                 }
             }
         }
