@@ -8,38 +8,30 @@ namespace C3Mod.GameTypes
 {
     public class ApocalypseMonsters
     {
-        public static List<C3Monster> Monsters = new List<C3Monster>();
+        public static List<int> Monsters = new List<int>();
 
         public static void AddNPCs()
         {
-            Monsters.Add(new C3Monster(1));
-            Monsters.Add(new C3Monster(6));
-            Monsters.Add(new C3Monster(23));
-            Monsters.Add(new C3Monster(26));
-            Monsters.Add(new C3Monster(27));
-            Monsters.Add(new C3Monster(28));
-            Monsters.Add(new C3Monster(29));
-            Monsters.Add(new C3Monster(31));
-            Monsters.Add(new C3Monster(32));
-            Monsters.Add(new C3Monster(42));
-            Monsters.Add(new C3Monster(47));
-            Monsters.Add(new C3Monster(50));
-            Monsters.Add(new C3Monster(62));
-            Monsters.Add(new C3Monster(48));
-            Monsters.Add(new C3Monster(34));
-            Monsters.Add(new C3Monster(24));
-            Monsters.Add(new C3Monster(23));
-            Monsters.Add(new C3Monster(51));
-        }
-    }
-
-    public class C3Monster
-    {
-        public int type { get; set; }
-
-        public C3Monster(int id)
-        {
-            type = id;
+            Monsters.Add(1);
+            Monsters.Add(6);
+            Monsters.Add(23);
+            Monsters.Add(26);
+            Monsters.Add(27);
+            Monsters.Add(28);
+            Monsters.Add(31);
+            Monsters.Add(42);
+            Monsters.Add(47);
+            Monsters.Add(50);
+            Monsters.Add(62);
+            Monsters.Add(48);
+            Monsters.Add(34);
+            Monsters.Add(23);
+            Monsters.Add(51);
+            Monsters.Add(67);
+            Monsters.Add(60);
+            Monsters.Add(49);
+            Monsters.Add(16);
+            Monsters.Add(61);
         }
     }
 }

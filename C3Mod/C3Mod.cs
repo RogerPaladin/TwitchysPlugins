@@ -25,7 +25,6 @@ namespace C3Mod
         public static List<C3Player> C3Players = new List<C3Player>();
         public static SqlTableEditor SQLEditor;
         public static SqlTableCreator SQLWriter;
-        public static List<int> MonsterIDs = new List<int>();
         public static readonly Version VersionNum = Assembly.GetExecutingAssembly().GetName().Version;
 
         public override string Name
@@ -326,7 +325,8 @@ namespace C3Mod
 
         public void OnGreetPlayer(int who, HandledEventArgs e)
         {
-            C3Players.Add(new C3Player(who));
+            lock (C3Players)
+                C3Players.Add(new C3Player(who));
             TShock.Players[who].SendMessage("This server is running C3Mod, created by Twitchy. Donate!", Color.Cyan);
         }
 
