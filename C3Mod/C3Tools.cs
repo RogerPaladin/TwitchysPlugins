@@ -257,25 +257,16 @@ namespace C3Mod
 
         public static void RemovePlayer(object ply)
         {
-            bool complete = false;
-
-            if (!C3Mod.UpdateLocked)
+            lock (C3Mod.C3Players)
             {
                 for (int i = 0; i < C3Mod.C3Players.Count; i++)
                 {
                     if (C3Mod.C3Players[i].Index.ToString() == ply.ToString())
                     {
                         C3Mod.C3Players.RemoveAt(i);
-                        complete = true;
                         break;
                     }
                 }
-            }
-
-            if (!complete)
-            {
-                Thread t = new Thread(RemovePlayer);
-                t.Start(ply);
             }
         }
     }

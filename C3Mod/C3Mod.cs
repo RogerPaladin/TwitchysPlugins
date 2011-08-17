@@ -27,7 +27,6 @@ namespace C3Mod
         public static SqlTableCreator SQLWriter;
         public static List<int> MonsterIDs = new List<int>();
         public static readonly Version VersionNum = Assembly.GetExecutingAssembly().GetName().Version;
-        public static bool UpdateLocked = false;
 
         public override string Name
         {

@@ -30,19 +30,20 @@ namespace C3Mod.GameTypes
 
         public static void OnUpdate(GameTime gameTime)
         {
-            C3Mod.UpdateLocked = true;
-
             if (C3Mod.VoteRunning && C3Mod.VoteType == "apoc")
             {
                 int VotedPlayers = 0;
                 int TotalPlayers = 0;
 
-                foreach (C3Player player in C3Mod.C3Players)
+                lock (C3Mod.C3Players)
                 {
-                    if (player.GameType == "" || player.GameType == "apoc")
-                        TotalPlayers++;
-                    if (player.GameType == "apoc")
-                        VotedPlayers++;
+                    foreach (C3Player player in C3Mod.C3Players)
+                    {
+                        if (player.GameType == "" || player.GameType == "apoc")
+                            TotalPlayers++;
+                        if (player.GameType == "apoc")
+                            VotedPlayers++;
+                    }
                 }
 
                 if (VotedPlayers == TotalPlayers)
@@ -277,11 +278,11 @@ namespace C3Mod.GameTypes
 
                 int apocplayers = 0;
 
-                foreach (C3Player player in C3Mod.C3Players)
+                lock(C3Mod.C3Players)
                 {
-                    if (player.GameType == "apoc")
+                    foreach (C3Player player in C3Mod.C3Players)
                     {
-                        if (player.TSPlayer != null)
+                        if (player.GameType == "apoc")
                         {
                             apocplayers++;
 
@@ -291,7 +292,7 @@ namespace C3Mod.GameTypes
                                 player.TSPlayer.SetTeam(3);
 
                             if (!player.TSPlayer.TpLock)
-                                if(C3Mod.C3Config.TPLockEnabled) { player.TSPlayer.TpLock = true; }
+                                if (C3Mod.C3Config.TPLockEnabled) { player.TSPlayer.TpLock = true; }
 
                             if (Main.player[player.Index].dead)
                             {
@@ -315,7 +316,7 @@ namespace C3Mod.GameTypes
                                         C3Tools.BroadcastMessageToGametype("apoc", player.PlayerName + ": Is out!", Color.Cyan);
                                         TShock.Players[player.Index].Teleport((int)SpectatorArea.X, (int)SpectatorArea.Y);
                                         player.Dead = true;
-                                    }                                    
+                                    }
                                 }
                                 else
                                 {
@@ -324,16 +325,9 @@ namespace C3Mod.GameTypes
                                 }
                             }
                         }
-                        else
-                        {
-                            C3Mod.C3Players.Remove(player);
-                            break;
-                        }
                     }
                 }
             }
-
-            C3Mod.UpdateLocked = false;
         }
 
         public static void SpawnMonsters()
@@ -413,15 +407,7 @@ namespace C3Mod.GameTypes
         {
             for (int i = 0; i < C3Mod.C3Players.Count; i++)
             {
-                if (C3Mod.C3Players[i].Team == 7)
-                {
-                    C3Mod.C3Players[i].TSPlayer.TpLock = false;
-                    Main.player[C3Mod.C3Players[i].Index].hostile = pvpstate;
-                    NetMessage.SendData(30, -1, -1, "", C3Mod.C3Players[i].Index, 0f, 0f, 0f);
-                    TShock.Players[C3Mod.C3Players[i].Index].SetTeam(0);
-                    TShock.Players[C3Mod.C3Players[i].Index].Spawn();
-                }
-                if (C3Mod.C3Players[i].Team == 8)
+                if (C3Mod.C3Players[i].GameType == "apoc")
                 {
                     C3Mod.C3Players[i].TSPlayer.TpLock = false;
                     Main.player[C3Mod.C3Players[i].Index].hostile = pvpstate;

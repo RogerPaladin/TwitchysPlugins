@@ -26,68 +26,27 @@ namespace C3Mod.GameTypes
 
         public static void OnUpdate(GameTime gameTime)
         {
-            C3Mod.UpdateLocked = true;
-
-            if (C3Mod.VoteRunning && C3Mod.VoteType == "ctf")
+            lock (C3Mod.C3Players)
             {
-                int VotedPlayers = 0;
-                int TotalPlayers = 0;
 
-                foreach (C3Player player in C3Mod.C3Players)
+                if (C3Mod.VoteRunning && C3Mod.VoteType == "ctf")
                 {
-                    if (player.GameType == "" || player.GameType == "ctf")
-                        TotalPlayers++;
-                    if (player.GameType == "ctf")
-                        VotedPlayers++;
-                }
-
-                if (VotedPlayers == TotalPlayers)
-                {
-                    C3Tools.BroadcastMessageToGametype("ctf", "Vote to play Capture the Flag passed, Teleporting to start positions", Color.DarkCyan);
-                    C3Mod.VoteRunning = false;
-                    C3Mod.VoteType = "";
-                    CTF.BlueTeamFlagCarrier = null;
-                    CTF.RedTeamFlagCarrier = null;
-                    CTF.BlueTeamScore = 0;
-                    CTF.RedTeamScore = 0;
-                    bool[] playersDead = new bool[Main.maxNetPlayers];
-                    CTF.TpToFlag();
-                    CTF.countDownTick = DateTime.UtcNow;
-                    CTF.CTFGameCountdown = true;
-                    return;
-                }
-
-                double tick = (DateTime.UtcNow - voteCountDown).TotalMilliseconds;
-                if (tick > (C3Mod.C3Config.VoteNotifyInterval * 1000) && VoteCount > 0)
-                {
-                    if (VoteCount != 1 && VoteCount < (C3Mod.C3Config.VoteTime / C3Mod.C3Config.VoteNotifyInterval))
-                    {
-                        C3Tools.BroadcastMessageToGametype("ctf", "Vote still in progress, please be patient", Color.Cyan);
-                        C3Tools.BroadcastMessageToGametype("", "Vote to play Capture the Flag in progress, type /join to join the lobby", Color.Cyan);
-                    }
-
-                    VoteCount--;
-                    voteCountDown = DateTime.UtcNow;
-                }
-
-                else if (VoteCount == 0)
-                {
-                    C3Mod.VoteRunning = false;
-
-                    int redteamplayers = 0;
-                    int blueteamplayers = 0;
+                    int VotedPlayers = 0;
+                    int TotalPlayers = 0;
 
                     foreach (C3Player player in C3Mod.C3Players)
                     {
-                        if (player.Team == 1)
-                            redteamplayers++;
-                        else if (player.Team == 2)
-                            blueteamplayers++;
+                        if (player.GameType == "" || player.GameType == "ctf")
+                            TotalPlayers++;
+                        if (player.GameType == "ctf")
+                            VotedPlayers++;
                     }
 
-                    if (redteamplayers >= C3Mod.C3Config.VoteCTFPlayersMinimumPerTeam && blueteamplayers >= C3Mod.C3Config.VoteCTFPlayersMinimumPerTeam)
+                    if (VotedPlayers == TotalPlayers)
                     {
                         C3Tools.BroadcastMessageToGametype("ctf", "Vote to play Capture the Flag passed, Teleporting to start positions", Color.DarkCyan);
+                        C3Mod.VoteRunning = false;
+                        C3Mod.VoteType = "";
                         CTF.BlueTeamFlagCarrier = null;
                         CTF.RedTeamFlagCarrier = null;
                         CTF.BlueTeamScore = 0;
@@ -96,232 +55,273 @@ namespace C3Mod.GameTypes
                         CTF.TpToFlag();
                         CTF.countDownTick = DateTime.UtcNow;
                         CTF.CTFGameCountdown = true;
+                        return;
                     }
-                    else
-                        C3Tools.BroadcastMessageToGametype("ctf", "Vote to play Capture the Flag failed, Not enough players", Color.DarkCyan);
-                }
-            }
 
-            if (CTFGameCountdown)
-            {
-                double tick = (DateTime.UtcNow - countDownTick).TotalMilliseconds;
-                if (tick > 1000 && StartCount > -1)
-                {
-                    if (TpToFlag() > 0)
+                    double tick = (DateTime.UtcNow - voteCountDown).TotalMilliseconds;
+                    if (tick > (C3Mod.C3Config.VoteNotifyInterval * 1000) && VoteCount > 0)
                     {
-                        if (StartCount == 0)
+                        if (VoteCount != 1 && VoteCount < (C3Mod.C3Config.VoteTime / C3Mod.C3Config.VoteNotifyInterval))
                         {
-                            C3Tools.BroadcastMessageToGametype("ctf", "Capture...The...Flag!!!", Color.Cyan);
-                            StartCount = 5;
-                            CTFGameCountdown = false;
-                            CTFGameRunning = true;
+                            C3Tools.BroadcastMessageToGametype("ctf", "Vote still in progress, please be patient", Color.Cyan);
+                            C3Tools.BroadcastMessageToGametype("", "Vote to play Capture the Flag in progress, type /join to join the lobby", Color.Cyan);
+                        }
+
+                        VoteCount--;
+                        voteCountDown = DateTime.UtcNow;
+                    }
+
+                    else if (VoteCount == 0)
+                    {
+                        C3Mod.VoteRunning = false;
+
+                        int redteamplayers = 0;
+                        int blueteamplayers = 0;
+
+                        foreach (C3Player player in C3Mod.C3Players)
+                        {
+                            if (player.Team == 1)
+                                redteamplayers++;
+                            else if (player.Team == 2)
+                                blueteamplayers++;
+                        }
+
+                        if (redteamplayers >= C3Mod.C3Config.VoteCTFPlayersMinimumPerTeam && blueteamplayers >= C3Mod.C3Config.VoteCTFPlayersMinimumPerTeam)
+                        {
+                            C3Tools.BroadcastMessageToGametype("ctf", "Vote to play Capture the Flag passed, Teleporting to start positions", Color.DarkCyan);
+                            CTF.BlueTeamFlagCarrier = null;
+                            CTF.RedTeamFlagCarrier = null;
+                            CTF.BlueTeamScore = 0;
+                            CTF.RedTeamScore = 0;
+                            bool[] playersDead = new bool[Main.maxNetPlayers];
+                            CTF.TpToFlag();
+                            CTF.countDownTick = DateTime.UtcNow;
+                            CTF.CTFGameCountdown = true;
+                        }
+                        else
+                            C3Tools.BroadcastMessageToGametype("ctf", "Vote to play Capture the Flag failed, Not enough players", Color.DarkCyan);
+                    }
+                }
+
+                if (CTFGameCountdown)
+                {
+                    double tick = (DateTime.UtcNow - countDownTick).TotalMilliseconds;
+                    if (tick > 1000 && StartCount > -1)
+                    {
+                        if (TpToFlag() > 0)
+                        {
+                            if (StartCount == 0)
+                            {
+                                C3Tools.BroadcastMessageToGametype("ctf", "Capture...The...Flag!!!", Color.Cyan);
+                                StartCount = 5;
+                                CTFGameCountdown = false;
+                                CTFGameRunning = true;
+                            }
+                            else
+                            {
+                                C3Tools.BroadcastMessageToGametype("ctf", "Game starting in " + StartCount.ToString() + "...", Color.Cyan);
+                                countDownTick = DateTime.UtcNow;
+                                StartCount--;
+                            }
                         }
                         else
                         {
-                            C3Tools.BroadcastMessageToGametype("ctf", "Game starting in " + StartCount.ToString() + "...", Color.Cyan);
-                            countDownTick = DateTime.UtcNow;
-                            StartCount--;
+                            StartCount = 5;
+                            C3Tools.ResetGameType("ctf");
+                            return;
                         }
                     }
-                    else
+                }
+
+                if (CTFGameRunning)
+                {
+                    int redteamplayers = 0;
+                    int blueteamplayers = 0;
+
+                    foreach (C3Player player in C3Mod.C3Players)
                     {
-                        StartCount = 5;
+                        if (player.TSPlayer == null)
+                        {
+                            C3Mod.C3Players.Remove(player);
+                            break;
+                        }
+
+                        if (player.GameType == "ctf")
+                        {
+                            if (!player.TSPlayer.TpLock)
+                                if (C3Mod.C3Config.TPLockEnabled) { player.TSPlayer.TpLock = true; }
+
+                            if (player.Team == 1)
+                                redteamplayers++;
+                            else if (player.Team == 2)
+                                blueteamplayers++;
+
+                            if ((player.Team == 1 && Main.player[player.Index].team != 1))
+                                TShock.Players[player.Index].SetTeam(1);
+                            else if (player.Team == 2 && Main.player[player.Index].team != 3)
+                                TShock.Players[player.Index].SetTeam(3);
+
+                            if (!Main.player[player.Index].hostile)
+                            {
+                                Main.player[player.Index].hostile = true;
+                                NetMessage.SendData((int)PacketTypes.TogglePvp, -1, -1, "", player.Index, 0f, 0f, 0f);
+                            }
+
+                            //Respawn on flag
+                            if (Main.player[player.Index].dead)
+                                player.Dead = true;
+                            else
+                            {
+                                if (player.Dead)
+                                {
+                                    player.Dead = false;
+                                    player.TSPlayer.TpLock = false;
+                                    if (player.Team == 1)
+                                        TShock.Players[player.Index].Teleport((int)flagPoints[0].X, (int)flagPoints[0].Y);
+                                    else if (player.Team == 2)
+                                        TShock.Players[player.Index].Teleport((int)flagPoints[1].X, (int)flagPoints[1].Y);
+                                    if (C3Mod.C3Config.TPLockEnabled) { player.TSPlayer.TpLock = true; }
+                                }
+                            }
+
+                            //Grab flag
+                            if (!player.Dead)
+                            {
+                                if (player.Team == 1 && RedTeamFlagCarrier == null)
+                                {
+                                    if ((int)player.tileX >= flagPoints[1].X - 2 && (int)player.tileX <= flagPoints[1].X + 2 && (int)player.tileY == (int)(flagPoints[1].Y - 3))
+                                    {
+                                        RedTeamFlagCarrier = player;
+                                        C3Tools.BroadcastMessageToGametype("ctf", Main.player[player.Index].name + " has the flag!", Color.OrangeRed);
+                                    }
+                                }
+                                if (player.Team == 2 && BlueTeamFlagCarrier == null)
+                                {
+                                    if ((int)player.tileX >= flagPoints[0].X - 2 && (int)player.tileX <= flagPoints[0].X + 2 && (int)player.tileY == (int)(flagPoints[0].Y - 3))
+                                    {
+                                        BlueTeamFlagCarrier = player;
+                                        C3Tools.BroadcastMessageToGametype("ctf", Main.player[player.Index].name + " has the flag!", Color.LightBlue);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (redteamplayers == 0 || blueteamplayers == 0)
+                    {
+                        C3Tools.BroadcastMessageToGametype("ctf", "Capture the Flag stopped, Not enough players to continue", Color.DarkCyan);
+                        CTFGameRunning = false;
+                        TpToSpawns(false);
                         C3Tools.ResetGameType("ctf");
                         return;
                     }
-                }
-            }
 
-            if (CTFGameRunning)
-            {
-                int redteamplayers = 0;
-                int blueteamplayers = 0;
-
-                foreach (C3Player player in C3Mod.C3Players)
-                {
-                    if (player.TSPlayer == null)
+                    //Check on flag carriers
+                    if (BlueTeamFlagCarrier != null)
                     {
-                        C3Mod.C3Players.Remove(player);
-                        break;
-                    }
-
-                    if (player.GameType == "ctf")
-                    {
-                        if (!player.TSPlayer.TpLock)
-                            if (C3Mod.C3Config.TPLockEnabled) { player.TSPlayer.TpLock = true; }
-
-                        if (player.Team == 1)
-                            redteamplayers++;
-                        else if (player.Team == 2)
-                            blueteamplayers++;
-
-                        if ((player.Team == 1 && Main.player[player.Index].team != 1))
-                            TShock.Players[player.Index].SetTeam(1);
-                        else if (player.Team == 2 && Main.player[player.Index].team != 3)
-                            TShock.Players[player.Index].SetTeam(3);
-
-                        if (!Main.player[player.Index].hostile)
+                        //Make them drop the flag
+                        if (BlueTeamFlagCarrier.TerrariaDead)
                         {
-                            Main.player[player.Index].hostile = true;
-                            NetMessage.SendData((int)PacketTypes.TogglePvp, -1, -1, "", player.Index, 0f, 0f, 0f);
+                            C3Tools.BroadcastMessageToGametype("ctf", BlueTeamFlagCarrier.PlayerName + ": Dropped the flag!", Color.LightBlue);
+                            BlueTeamFlagCarrier = null;
                         }
-
-                        //Respawn on flag
-                        if (Main.player[player.Index].dead)
-                            player.Dead = true;
+                        //Capture the flag
                         else
                         {
-                            if (player.Dead)
+                            if ((int)BlueTeamFlagCarrier.tileX >= flagPoints[1].X - 2 && (int)BlueTeamFlagCarrier.tileX <= flagPoints[1].X + 2 && (int)BlueTeamFlagCarrier.tileY == (int)(flagPoints[1].Y - 3))
                             {
-                                player.Dead = false;
-                                player.TSPlayer.TpLock = false;
-                                if (player.Team == 1)
-                                    TShock.Players[player.Index].Teleport((int)flagPoints[0].X, (int)flagPoints[0].Y);
-                                else if (player.Team == 2)
-                                    TShock.Players[player.Index].Teleport((int)flagPoints[1].X, (int)flagPoints[1].Y);
-                                if(C3Mod.C3Config.TPLockEnabled) { player.TSPlayer.TpLock = true; }
-                            }
-                        }
+                                BlueTeamScore++;
+                                C3Tools.BroadcastMessageToGametype("ctf", BlueTeamFlagCarrier.PlayerName + ": Scores!  Blue - " + BlueTeamScore.ToString() + " --- " + RedTeamScore.ToString() + " - Red", Color.LightBlue);
+                                RedTeamFlagCarrier = null;
+                                BlueTeamFlagCarrier = null;
 
-                        //Grab flag
-                        if (!player.Dead)
-                        {
-                            if (player.Team == 1 && RedTeamFlagCarrier == null)
-                            {
-                                if ((int)player.tileX >= flagPoints[1].X - 2 && (int)player.tileX <= flagPoints[1].X + 2 && (int)player.tileY == (int)(flagPoints[1].Y - 3))
+                                if (C3Mod.C3Config.RespawnPlayersOnFlagCapture && BlueTeamScore != C3Mod.C3Config.CTFScoreLimit)
+                                    TpToFlag();
+
+                                if (C3Mod.C3Config.ReCountdownOnFlagCapture && BlueTeamScore != C3Mod.C3Config.CTFScoreLimit)
                                 {
-                                    RedTeamFlagCarrier = player;
-                                    C3Tools.BroadcastMessageToGametype("ctf", Main.player[player.Index].name + " has the flag!", Color.OrangeRed);
+                                    CTFGameRunning = false;
+                                    CTFGameCountdown = true;
+                                }
+
+                                if (C3Mod.C3Config.HealPlayersOnFlagCapture)
+                                {
+                                    Item heart = Tools.GetItemById(58);
+                                    Item star = Tools.GetItemById(184);
+
+                                    foreach (C3Player player in C3Mod.C3Players)
+                                    {
+                                        if (player.GameType == "ctf")
+                                        {
+                                            player.GiveItem(heart.type, heart.name, heart.width, heart.height, 20);
+                                            player.GiveItem(star.type, star.name, star.width, star.height, 20);
+                                        }
+                                    }
                                 }
                             }
-                            if (player.Team == 2 && BlueTeamFlagCarrier == null)
+                        }
+                    }
+                    if (RedTeamFlagCarrier != null)
+                    {
+                        if (RedTeamFlagCarrier.TerrariaDead)
+                        {
+                            C3Tools.BroadcastMessageToGametype("ctf", RedTeamFlagCarrier.PlayerName + ": Dropped the flag!", Color.OrangeRed);
+                            RedTeamFlagCarrier = null;
+                        }
+                        else
+                        {
+                            if ((int)RedTeamFlagCarrier.tileX >= flagPoints[0].X - 2 && (int)RedTeamFlagCarrier.tileX <= flagPoints[0].X + 2 && (int)RedTeamFlagCarrier.tileY == (int)(flagPoints[0].Y - 3))
                             {
-                                if ((int)player.tileX >= flagPoints[0].X - 2 && (int)player.tileX <= flagPoints[0].X + 2 && (int)player.tileY == (int)(flagPoints[0].Y - 3))
+                                RedTeamScore++;
+                                C3Tools.BroadcastMessageToGametype("ctf", RedTeamFlagCarrier.PlayerName + ": Scores!  Red - " + RedTeamScore.ToString() + " --- " + BlueTeamScore.ToString() + " - Blue", Color.OrangeRed);
+                                RedTeamFlagCarrier = null;
+                                BlueTeamFlagCarrier = null;
+
+                                if (C3Mod.C3Config.RespawnPlayersOnFlagCapture && RedTeamScore != C3Mod.C3Config.CTFScoreLimit)
+                                    TpToFlag();
+
+                                if (C3Mod.C3Config.ReCountdownOnFlagCapture && RedTeamScore != C3Mod.C3Config.CTFScoreLimit)
                                 {
-                                    BlueTeamFlagCarrier = player;
-                                    C3Tools.BroadcastMessageToGametype("ctf", Main.player[player.Index].name + " has the flag!", Color.LightBlue);
+                                    CTFGameRunning = false;
+                                    CTFGameCountdown = true;
+                                }
+
+                                if (C3Mod.C3Config.HealPlayersOnFlagCapture)
+                                {
+                                    Item heart = Tools.GetItemById(58);
+                                    Item star = Tools.GetItemById(184);
+
+                                    foreach (C3Player player in C3Mod.C3Players)
+                                    {
+                                        if (player.GameType == "ctf")
+                                        {
+                                            player.GiveItem(heart.type, heart.name, heart.width, heart.height, 20);
+                                            player.GiveItem(star.type, star.name, star.width, star.height, 20);
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
 
-                if (redteamplayers == 0 || blueteamplayers == 0)
+                if (BlueTeamScore == C3Mod.C3Config.CTFScoreLimit)
                 {
-                    C3Tools.BroadcastMessageToGametype("ctf", "Capture the Flag stopped, Not enough players to continue", Color.DarkCyan);
                     CTFGameRunning = false;
+                    C3Tools.BroadcastMessageToGametype("ctf", "BLUE TEAM WINS!", Color.LightBlue);
                     TpToSpawns(false);
                     C3Tools.ResetGameType("ctf");
                     return;
                 }
-
-                //Check on flag carriers
-                if (BlueTeamFlagCarrier != null)
+                if (RedTeamScore == C3Mod.C3Config.CTFScoreLimit)
                 {
-                    //Make them drop the flag
-                    if (BlueTeamFlagCarrier.TerrariaDead)
-                    {
-                        C3Tools.BroadcastMessageToGametype("ctf", BlueTeamFlagCarrier.PlayerName + ": Dropped the flag!", Color.LightBlue);
-                        BlueTeamFlagCarrier = null;
-                    }
-                    //Capture the flag
-                    else
-                    {
-                        if ((int)BlueTeamFlagCarrier.tileX >= flagPoints[1].X - 2 && (int)BlueTeamFlagCarrier.tileX <= flagPoints[1].X + 2 && (int)BlueTeamFlagCarrier.tileY == (int)(flagPoints[1].Y - 3))
-                        {
-                            BlueTeamScore++;
-                            C3Tools.BroadcastMessageToGametype("ctf", BlueTeamFlagCarrier.PlayerName + ": Scores!  Blue - " + BlueTeamScore.ToString() + " --- " + RedTeamScore.ToString() + " - Red", Color.LightBlue);
-                            RedTeamFlagCarrier = null;
-                            BlueTeamFlagCarrier = null;
-
-                            if (C3Mod.C3Config.RespawnPlayersOnFlagCapture && BlueTeamScore != C3Mod.C3Config.CTFScoreLimit)
-                                TpToFlag();
-
-                            if (C3Mod.C3Config.ReCountdownOnFlagCapture && BlueTeamScore != C3Mod.C3Config.CTFScoreLimit)
-                            {
-                                CTFGameRunning = false;
-                                CTFGameCountdown = true;
-                            }
-
-                            if (C3Mod.C3Config.HealPlayersOnFlagCapture)
-                            {
-                                Item heart = Tools.GetItemById(58);
-                                Item star = Tools.GetItemById(184);
-
-                                foreach (C3Player player in C3Mod.C3Players)
-                                {
-                                    if (player.GameType == "ctf")
-                                    {
-                                        player.GiveItem(heart.type, heart.name, heart.width, heart.height, 20);
-                                        player.GiveItem(star.type, star.name, star.width, star.height, 20);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (RedTeamFlagCarrier != null)
-                {
-                    if (RedTeamFlagCarrier.TerrariaDead)
-                    {
-                        C3Tools.BroadcastMessageToGametype("ctf", RedTeamFlagCarrier.PlayerName + ": Dropped the flag!", Color.OrangeRed);
-                        RedTeamFlagCarrier = null;
-                    }
-                    else
-                    {
-                        if ((int)RedTeamFlagCarrier.tileX >= flagPoints[0].X - 2 && (int)RedTeamFlagCarrier.tileX <= flagPoints[0].X + 2 && (int)RedTeamFlagCarrier.tileY == (int)(flagPoints[0].Y - 3))
-                        {
-                            RedTeamScore++;
-                            C3Tools.BroadcastMessageToGametype("ctf", RedTeamFlagCarrier.PlayerName + ": Scores!  Red - " + RedTeamScore.ToString() + " --- " + BlueTeamScore.ToString() + " - Blue", Color.OrangeRed);
-                            RedTeamFlagCarrier = null;
-                            BlueTeamFlagCarrier = null;
-
-                            if (C3Mod.C3Config.RespawnPlayersOnFlagCapture && RedTeamScore != C3Mod.C3Config.CTFScoreLimit)
-                                TpToFlag();
-
-                            if (C3Mod.C3Config.ReCountdownOnFlagCapture && RedTeamScore != C3Mod.C3Config.CTFScoreLimit)
-                            {
-                                CTFGameRunning = false;
-                                CTFGameCountdown = true;
-                            }
-
-                            if (C3Mod.C3Config.HealPlayersOnFlagCapture)
-                            {
-                                Item heart = Tools.GetItemById(58);
-                                Item star = Tools.GetItemById(184);
-
-                                foreach (C3Player player in C3Mod.C3Players)
-                                {
-                                    if (player.GameType == "ctf")
-                                    {
-                                        player.GiveItem(heart.type, heart.name, heart.width, heart.height, 20);
-                                        player.GiveItem(star.type, star.name, star.width, star.height, 20);
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    CTFGameRunning = false;
+                    C3Tools.BroadcastMessageToGametype("ctf", "RED TEAM WINS!", Color.OrangeRed);
+                    TpToSpawns(false);
+                    C3Tools.ResetGameType("ctf");
+                    return;
                 }
             }
-
-            if (BlueTeamScore == C3Mod.C3Config.CTFScoreLimit)
-            {
-                CTFGameRunning = false;
-                C3Tools.BroadcastMessageToGametype("ctf", "BLUE TEAM WINS!", Color.LightBlue);
-                TpToSpawns(false);
-                C3Tools.ResetGameType("ctf");
-                return;
-            }
-            if (RedTeamScore == C3Mod.C3Config.CTFScoreLimit)
-            {
-                CTFGameRunning = false;
-                C3Tools.BroadcastMessageToGametype("ctf", "RED TEAM WINS!", Color.OrangeRed);
-                TpToSpawns(false);
-                C3Tools.ResetGameType("ctf");
-                return;
-            }
-
-            C3Mod.UpdateLocked = false;
         }
 
         public static int TpToFlag()

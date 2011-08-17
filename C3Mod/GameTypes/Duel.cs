@@ -22,29 +22,30 @@ namespace C3Mod.GameTypes
 
         public static void OnUpdate(GameTime gameTime)
         {
-            C3Mod.UpdateLocked = true;
-
-            foreach (C3Player player in C3Mod.C3Players)
+            lock (C3Mod.C3Players)
             {
-                if (player.Challenging != null)
+                foreach (C3Player player in C3Mod.C3Players)
                 {
-                    double tick = (DateTime.UtcNow - player.ChallengeTick).TotalMilliseconds;
-                    if (tick > (C3Mod.C3Config.DuelNotifyInterval * 1000))
+                    if (player.Challenging != null)
                     {
-                        if (player.ChallengeNotifyCount != 1)
+                        double tick = (DateTime.UtcNow - player.ChallengeTick).TotalMilliseconds;
+                        if (tick > (C3Mod.C3Config.DuelNotifyInterval * 1000))
                         {
-                            player.Challenging.SendMessage("You have been challenged to a duel by: " + player.PlayerName, Color.Cyan);
-                            player.Challenging.SendMessage("Type /accept to accept this challenge!", Color.Cyan);
+                            if (player.ChallengeNotifyCount != 1)
+                            {
+                                player.Challenging.SendMessage("You have been challenged to a duel by: " + player.PlayerName, Color.Cyan);
+                                player.Challenging.SendMessage("Type /accept to accept this challenge!", Color.Cyan);
+                            }
+                            player.ChallengeNotifyCount--;
+                            player.ChallengeTick = DateTime.UtcNow;
                         }
-                        player.ChallengeNotifyCount--;
-                        player.ChallengeTick = DateTime.UtcNow;
-                    }
-                    else if (player.ChallengeNotifyCount == 0)
-                    {
-                        player.Challenging.SendMessage("Challenge by: " + player.PlayerName + " timed out", Color.Cyan);
-                        player.SendMessage(player.Challenging.PlayerName + ": Did not answer your challenge in the required amount of time", Color.DarkCyan);
-                        player.Challenging = null;
-                        player.ChallengeNotifyCount = 5;
+                        else if (player.ChallengeNotifyCount == 0)
+                        {
+                            player.Challenging.SendMessage("Challenge by: " + player.PlayerName + " timed out", Color.Cyan);
+                            player.SendMessage(player.Challenging.PlayerName + ": Did not answer your challenge in the required amount of time", Color.DarkCyan);
+                            player.Challenging = null;
+                            player.ChallengeNotifyCount = 5;
+                        }
                     }
                 }
             }
@@ -84,80 +85,84 @@ namespace C3Mod.GameTypes
                 int RedTeamPlayer = 0;
                 int BlueTeamPlayer = 0;
 
-                foreach (C3Player player in C3Mod.C3Players)
+                lock (C3Mod.C3Players)
                 {
-                    if (player.TSPlayer == null)
+                    foreach (C3Player player in C3Mod.C3Players)
                     {
-                        C3Mod.C3Players.Remove(player);
-                        break;
-                    }
-
-                    if (player.GameType == "1v1")
-                    {
-                        if (!player.TSPlayer.TpLock)
-                            if (C3Mod.C3Config.TPLockEnabled) { player.TSPlayer.TpLock = true; }
-
-                        if (player.Team == 3)
-                            RedTeamPlayer++;
-                        else if (player.Team == 4)
-                            BlueTeamPlayer++;
-
-                        if ((player.Team == 3 && Main.player[player.Index].team != 1))
-                            TShock.Players[player.Index].SetTeam(1);
-                        else if (player.Team == 4 && Main.player[player.Index].team != 3)
-                            TShock.Players[player.Index].SetTeam(3);
-
-                        if (!Main.player[player.Index].hostile)
+                        if (player.TSPlayer == null)
                         {
-                            Main.player[player.Index].hostile = true;
-                            NetMessage.SendData((int)PacketTypes.TogglePvp, -1, -1, "", player.Index, 0f, 0f, 0f);
+                            C3Mod.C3Players.Remove(player);
+                            break;
                         }
 
-                        //Respawn on flag
-                        if (Main.player[player.Index].dead)
+                        if (player.GameType == "1v1")
                         {
+                            if (!player.TSPlayer.TpLock)
+                                if (C3Mod.C3Config.TPLockEnabled) { player.TSPlayer.TpLock = true; }
+
                             if (player.Team == 3)
+                                RedTeamPlayer++;
+                            else if (player.Team == 4)
+                                BlueTeamPlayer++;
+
+                            if ((player.Team == 3 && Main.player[player.Index].team != 1))
+                                TShock.Players[player.Index].SetTeam(1);
+                            else if (player.Team == 4 && Main.player[player.Index].team != 3)
+                                TShock.Players[player.Index].SetTeam(3);
+
+                            if (!Main.player[player.Index].hostile)
                             {
-                                BluePlayerScore++;
+                                Main.player[player.Index].hostile = true;
+                                NetMessage.SendData((int)PacketTypes.TogglePvp, -1, -1, "", player.Index, 0f, 0f, 0f);
+                            }
 
-                                if (BluePlayerScore != C3Mod.C3Config.DuelScoreLimit)
+                            //Respawn on flag
+                            if (Main.player[player.Index].dead)
+                            {
+                                if (player.Team == 3)
                                 {
-                                    C3Tools.BroadcastMessageToGametype("1v1", BluePlayer.PlayerName + ": Scores!", Color.DarkCyan);
-                                    TpToSpawnPoint();
-                                    DuelRunning = false;
-                                    DuelCountdown = true;
+                                    BluePlayerScore++;
 
-                                    Item heart = Tools.GetItemById(58);
-                                    Item star = Tools.GetItemById(184);
-                                    foreach (C3Player players in C3Mod.C3Players)
+                                    if (BluePlayerScore != C3Mod.C3Config.DuelScoreLimit)
                                     {
-                                        if (players.GameType == "1v1")
+                                        C3Tools.BroadcastMessageToGametype("1v1", BluePlayer.PlayerName + ": Scores!", Color.DarkCyan);
+                                        TpToSpawnPoint();
+                                        DuelRunning = false;
+                                        DuelCountdown = true;
+
+                                        Item heart = Tools.GetItemById(58);
+                                        Item star = Tools.GetItemById(184);
+                                        foreach (C3Player players in C3Mod.C3Players)
                                         {
-                                            players.GiveItem(heart.type, heart.name, heart.width, heart.height, 20);
-                                            players.GiveItem(star.type, star.name, star.width, star.height, 20);
+                                            if (players.GameType == "1v1")
+                                            {
+                                                players.GiveItem(heart.type, heart.name, heart.width, heart.height, 20);
+                                                players.GiveItem(star.type, star.name, star.width, star.height, 20);
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            else if (player.Team == 4)
-                            {
-                                RedPlayerScore++;
-
-                                if (RedPlayerScore != C3Mod.C3Config.DuelScoreLimit)
+                                else if (player.Team == 4)
                                 {
-                                    C3Tools.BroadcastMessageToGametype("1v1", RedPlayer.PlayerName + ": Scores!", Color.DarkCyan);
-                                    TpToSpawnPoint();
-                                    DuelRunning = false;
-                                    DuelCountdown = true;
+                                    RedPlayerScore++;
 
-                                    Item heart = Tools.GetItemById(58);
-                                    Item star = Tools.GetItemById(184);
-                                    foreach (C3Player players in C3Mod.C3Players)
+                                    if (RedPlayerScore != C3Mod.C3Config.DuelScoreLimit)
                                     {
-                                        if (players.GameType == "1v1")
+                                        C3Tools.BroadcastMessageToGametype("1v1", RedPlayer.PlayerName + ": Scores!", Color.DarkCyan);
+                                        TpToSpawnPoint();
+                                        DuelRunning = false;
+                                        DuelCountdown = true;
+
+                                        Item heart = Tools.GetItemById(58);
+                                        Item star = Tools.GetItemById(184);
+
+                                        foreach (C3Player players in C3Mod.C3Players)
                                         {
-                                            players.GiveItem(heart.type, heart.name, heart.width, heart.height, 20);
-                                            players.GiveItem(star.type, star.name, star.width, star.height, 20);
+                                            if (players.GameType == "1v1")
+                                            {
+                                                players.GiveItem(heart.type, heart.name, heart.width, heart.height, 20);
+                                                players.GiveItem(star.type, star.name, star.width, star.height, 20);
+                                            }
                                         }
                                     }
                                 }
@@ -201,8 +206,6 @@ namespace C3Mod.GameTypes
                     return;
                 }
             }
-
-            C3Mod.UpdateLocked = false;
         }        
 
         public static int TpToSpawnPoint()
@@ -222,7 +225,7 @@ namespace C3Mod.GameTypes
                         {
                             TShock.Players[C3Mod.C3Players[i].Index].Teleport((int)DuelSpawns[0].X, (int)DuelSpawns[0].Y);
                         }
-                        if(C3Mod.C3Config.TPLockEnabled) { C3Mod.C3Players[i].TSPlayer.TpLock = true; }
+                        if (C3Mod.C3Config.TPLockEnabled) { C3Mod.C3Players[i].TSPlayer.TpLock = true; }
                     }
                     else if (C3Mod.C3Players[i].Team == 4)
                     {
@@ -232,9 +235,10 @@ namespace C3Mod.GameTypes
                         {
                             TShock.Players[C3Mod.C3Players[i].Index].Teleport((int)DuelSpawns[1].X, (int)DuelSpawns[1].Y);
                         }
-                        if(C3Mod.C3Config.TPLockEnabled) { C3Mod.C3Players[i].TSPlayer.TpLock = true; }
+                        if (C3Mod.C3Config.TPLockEnabled) { C3Mod.C3Players[i].TSPlayer.TpLock = true; }
                     }
                 }
+
                 if (!RedTeamPlayer || !BlueTeamPlayer)
                 {
                     C3Tools.BroadcastMessageToGametype("1v1", "Opponent left, ending game", Color.DarkCyan);
