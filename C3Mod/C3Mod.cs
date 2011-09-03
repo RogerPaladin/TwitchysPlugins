@@ -33,7 +33,7 @@ namespace C3Mod
         }
         public override string Author
         {
-            get { return "Created by Twitchy"; }
+            get { return "Created by Twitchy. Modded by RogerPaladin."; }
         }
         public override string Description
         {

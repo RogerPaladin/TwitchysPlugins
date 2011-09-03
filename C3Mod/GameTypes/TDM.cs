@@ -207,6 +207,20 @@ namespace C3Mod.GameTypes
                     {
                         TDMRunning = false;
                         C3Tools.BroadcastMessageToGametype("tdm", "BLUE TEAM WINS!", Color.LightBlue);
+                        C3Tools.BroadcastMessageToGametype("", "Blue team wins in a TDM and earn " + (BlueTeamScore * 0.2) + 0.5 + "RCoins!", Color.LightBlue);
+                        foreach (C3Player player in C3Mod.C3Players)
+                        {
+                            if (player.Team == 7)
+                            {
+                                TShock.Users.SetRCoins(player.PlayerName, RedTeamScore * 0.1);
+                                player.SendMessage("Your consolation prize is: " + RedTeamScore * 0.1 + "RCoins!", Color.Green);
+                            }
+                            else
+                            {
+                                TShock.Users.SetRCoins(player.PlayerName, (BlueTeamScore * 0.2) + 0.5);
+                                player.SendMessage("Your award is: " + (BlueTeamScore * 0.2) + 0.5 + "RCoins!", Color.Green);
+                            }
+                        }
                         TpToSpawns(false);
                         C3Tools.ResetGameType("tdm");
                         return;
@@ -216,6 +230,20 @@ namespace C3Mod.GameTypes
                     {
                         TDMRunning = false;
                         C3Tools.BroadcastMessageToGametype("tdm", "RED TEAM WINS!", Color.OrangeRed);
+                        C3Tools.BroadcastMessageToGametype("", "RED team wins in a TDM and earn " + (RedTeamScore * 0.2) + 0.5 + "RCoins!", Color.OrangeRed);
+                        foreach (C3Player player in C3Mod.C3Players)
+                        {
+                            if (player.Team == 8)
+                            {
+                                TShock.Users.SetRCoins(player.PlayerName, BlueTeamScore * 0.1);
+                                player.SendMessage("Your consolation prize is: " + BlueTeamScore * 0.1 + "RCoins!", Color.Green);
+                            }
+                            else
+                            {
+                                TShock.Users.SetRCoins(player.PlayerName, (RedTeamScore * 0.2) + 0.5);
+                                player.SendMessage("Your award is: " + (RedTeamScore * 0.2) + 0.5 + "RCoins!", Color.Green);
+                            }
+                        }
                         TpToSpawns(false);
                         C3Tools.ResetGameType("tdm");
                         return;

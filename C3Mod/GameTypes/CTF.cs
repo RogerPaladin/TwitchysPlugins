@@ -231,6 +231,7 @@ namespace C3Mod.GameTypes
                             if ((int)BlueTeamFlagCarrier.tileX >= flagPoints[1].X - 2 && (int)BlueTeamFlagCarrier.tileX <= flagPoints[1].X + 2 && (int)BlueTeamFlagCarrier.tileY == (int)(flagPoints[1].Y - 3))
                             {
                                 BlueTeamScore++;
+                                BlueTeamFlagCarrier.Flags++;
                                 C3Tools.BroadcastMessageToGametype("ctf", BlueTeamFlagCarrier.PlayerName + ": Scores!  Blue - " + BlueTeamScore.ToString() + " --- " + RedTeamScore.ToString() + " - Red", Color.LightBlue);
                                 RedTeamFlagCarrier = null;
                                 BlueTeamFlagCarrier = null;
@@ -273,6 +274,7 @@ namespace C3Mod.GameTypes
                             if ((int)RedTeamFlagCarrier.tileX >= flagPoints[0].X - 2 && (int)RedTeamFlagCarrier.tileX <= flagPoints[0].X + 2 && (int)RedTeamFlagCarrier.tileY == (int)(flagPoints[0].Y - 3))
                             {
                                 RedTeamScore++;
+                                RedTeamFlagCarrier.Flags++;
                                 C3Tools.BroadcastMessageToGametype("ctf", RedTeamFlagCarrier.PlayerName + ": Scores!  Red - " + RedTeamScore.ToString() + " --- " + BlueTeamScore.ToString() + " - Blue", Color.OrangeRed);
                                 RedTeamFlagCarrier = null;
                                 BlueTeamFlagCarrier = null;
@@ -309,6 +311,28 @@ namespace C3Mod.GameTypes
                 {
                     CTFGameRunning = false;
                     C3Tools.BroadcastMessageToGametype("ctf", "BLUE TEAM WINS!", Color.LightBlue);
+                    C3Tools.BroadcastMessageToGametype("", "Blue team wins in a CTF and earn " + (BlueTeamScore * 0.2) + 0.5 + "RCoins!", Color.LightBlue);
+                    foreach (C3Player player in C3Mod.C3Players)
+                    {
+                        if (player.Team == 7)
+                        {
+                            TShock.Users.SetRCoins(player.PlayerName, (RedTeamScore * 0.1) + (player.Flags * 0.2));
+                            player.SendMessage("Your consolation prize is: " + (RedTeamScore * 0.1) + "RCoins!", Color.Green);
+                            if (player.Flags > 0)
+                            {
+                                player.SendMessage("Your extra prize for flags is: " + (player.Flags * 0.2) + "RCoins!", Color.Yellow);
+                            }
+                        }
+                        else
+                        {
+                            TShock.Users.SetRCoins(player.PlayerName, (BlueTeamScore * 0.2) + (player.Flags * 0.2) + 0.5);
+                            player.SendMessage("Your award is: " + (BlueTeamScore * 0.2) + 0.5 + "RCoins!", Color.Green);
+                            if (player.Flags > 0)
+                            {
+                                player.SendMessage("Your extra prize for flags is: " + (player.Flags * 0.2) + "RCoins!", Color.Yellow);
+                            }
+                        }
+                    }
                     TpToSpawns(false);
                     C3Tools.ResetGameType("ctf");
                     return;
@@ -317,6 +341,28 @@ namespace C3Mod.GameTypes
                 {
                     CTFGameRunning = false;
                     C3Tools.BroadcastMessageToGametype("ctf", "RED TEAM WINS!", Color.OrangeRed);
+                    C3Tools.BroadcastMessageToGametype("", "RED team wins in a CTF and earn " + (RedTeamScore * 0.2) + 0.5 + "RCoins!", Color.OrangeRed);
+                    foreach (C3Player player in C3Mod.C3Players)
+                    {
+                        if (player.Team == 8)
+                        {
+                            TShock.Users.SetRCoins(player.PlayerName, (BlueTeamScore * 0.1) + (player.Flags * 0.2));
+                            player.SendMessage("Your consolation prize is: " + BlueTeamScore * 0.1 + "RCoins!", Color.Green);
+                            if (player.Flags > 0)
+                            {
+                                player.SendMessage("Your extra prize for flags is: " + (player.Flags * 0.2) + "RCoins!", Color.Yellow);
+                            }
+                        }
+                        else
+                        {
+                            TShock.Users.SetRCoins(player.PlayerName, (RedTeamScore * 0.2) + (player.Flags * 0.2) + 0.5);
+                            player.SendMessage("Your award is: " + (RedTeamScore * 0.2) + 0.5 + "RCoins!", Color.Green);
+                            if (player.Flags > 0)
+                            {
+                                player.SendMessage("Your extra prize for flags is: " + (player.Flags * 0.2) + "RCoins!", Color.Yellow);
+                            }
+                        }
+                    }
                     TpToSpawns(false);
                     C3Tools.ResetGameType("ctf");
                     return;

@@ -667,5 +667,119 @@ namespace C3Mod
             else
                 player.SendMessage("You are not in a game!", Color.Cyan);
         }
+
+        public static void Teams(CommandArgs args)
+        {
+            if (CTF.CTFGameRunning || CTF.CTFGameCountdown ||
+                TDM.TDMRunning || TDM.TDMCountdown ||
+                Duel.DuelRunning || Duel.DuelCountdown ||
+                OneFlagCTF.OneFlagGameRunning || OneFlagCTF.OneFlagGameCountdown ||
+                Apocalypse.Running)
+            {
+                string RedTeam = string.Empty;
+                string BlueTeam = string.Empty;
+
+                #region CTF
+                if (CTF.CTFGameRunning || CTF.CTFGameCountdown)
+                {
+                    foreach (C3Player player in C3Mod.C3Players)
+                    {
+                        if (player.Team == 7)
+                        {
+                            RedTeam = string.Format("{0} {1}", RedTeam, player.PlayerName);
+                        }
+                        else
+                        {
+                            BlueTeam = string.Format("{0} {1}", BlueTeam, player.PlayerName);
+                        }
+                    }
+                    RedTeam = RedTeam.Remove(0, 1);
+                    BlueTeam = BlueTeam.Remove(0, 1);
+                    args.Player.SendMessage("CTF Game Started", Color.DarkCyan);
+                    args.Player.SendMessage("Red Team: " + RedTeam, Color.OrangeRed);
+                    args.Player.SendMessage("Blue Team: " + BlueTeam, Color.LightBlue);
+                }
+#endregion
+                #region TDM
+                if (TDM.TDMRunning || TDM.TDMCountdown)
+                {
+                    foreach (C3Player player in C3Mod.C3Players)
+                    {
+                        if (player.Team == 7)
+                        {
+                            RedTeam = string.Format("{0} {1}", RedTeam, player.PlayerName);
+                        }
+                        else
+                        {
+                            BlueTeam = string.Format("{0} {1}", BlueTeam, player.PlayerName);
+                        }
+                    }
+                    RedTeam = RedTeam.Remove(0, 1);
+                    BlueTeam = BlueTeam.Remove(0, 1);
+                    args.Player.SendMessage("TDM Game Started", Color.DarkCyan);
+                    args.Player.SendMessage("Red Team: " + RedTeam, Color.OrangeRed);
+                    args.Player.SendMessage("Blue Team: " + BlueTeam, Color.LightBlue);
+                }
+                #endregion
+                #region Duel
+                if (Duel.DuelRunning || Duel.DuelCountdown)
+                {
+                    foreach (C3Player player in C3Mod.C3Players)
+                    {
+                        if (player.Team == 3)
+                        {
+                            RedTeam = string.Format("{0} {1}", RedTeam, player.PlayerName);
+                        }
+                        else
+                        {
+                            BlueTeam = string.Format("{0} {1}", BlueTeam, player.PlayerName);
+                        }
+                    }
+                    RedTeam = RedTeam.Remove(0, 1);
+                    BlueTeam = BlueTeam.Remove(0, 1);
+                    args.Player.SendMessage("Duel Game Started", Color.DarkCyan);
+                    args.Player.SendMessage("Red Team: " + RedTeam, Color.OrangeRed);
+                    args.Player.SendMessage("Blue Team: " + BlueTeam, Color.LightBlue);
+                }
+                #endregion
+                #region OneFlagCTF
+                if (OneFlagCTF.OneFlagGameRunning || OneFlagCTF.OneFlagGameCountdown)
+                {
+                    foreach (C3Player player in C3Mod.C3Players)
+                    {
+                        if (player.Team == 5)
+                        {
+                            RedTeam = string.Format("{0} {1}", RedTeam, player.PlayerName);
+                        }
+                        else
+                        {
+                            BlueTeam = string.Format("{0} {1}", BlueTeam, player.PlayerName);
+                        }
+                    }
+                    RedTeam = RedTeam.Remove(0, 1);
+                    BlueTeam = BlueTeam.Remove(0, 1);
+                    args.Player.SendMessage("OneFlagCTF Game Started", Color.DarkCyan);
+                    args.Player.SendMessage("Red Team: " + RedTeam, Color.OrangeRed);
+                    args.Player.SendMessage("Blue Team: " + BlueTeam, Color.LightBlue);
+                }
+                #endregion
+                #region Apocalypse
+                if (Apocalypse.Running)
+                {
+                    foreach (C3Player player in C3Mod.C3Players)
+                    {
+                            RedTeam = string.Format("{0} {1}", RedTeam, player.PlayerName);
+                    }
+                    RedTeam = RedTeam.Remove(0, 1);
+                    args.Player.SendMessage("Apocalypse Game Started", Color.DarkCyan);
+                    args.Player.SendMessage("Apocalypse Team: " + RedTeam, Color.OrangeRed);
+                }
+                #endregion
+            }
+            else
+            {
+                args.Player.SendMessage("No events started.", Color.Red);
+            }
+        }
     }
 }

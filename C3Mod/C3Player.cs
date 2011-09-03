@@ -13,6 +13,7 @@ namespace C3Mod
     {
         public int Index;
         public int Team = 0;
+        public int Flags = 0;
         public bool TerrariaDead { get { return Main.player[Index].dead; } }
         public bool Dead = false;
         public string GameType = "";
