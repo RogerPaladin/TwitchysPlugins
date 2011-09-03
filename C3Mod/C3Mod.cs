@@ -154,6 +154,7 @@ namespace C3Mod
             Commands.ChatCommands.Add(new Command("duel", C3Commands.ChallengePlayer, "duel"));
             Commands.ChatCommands.Add(new Command(C3Commands.AcceptChallenge, "accept"));
             Commands.ChatCommands.Add(new Command(C3Commands.Quit, "quit"));
+            Commands.ChatCommands.Add(new Command(C3Commands.Teams, "teams"));
             Commands.ChatCommands.Add(new Command("setspawns", C3Commands.SetDuelBlueSpawn, "setduelbluespawn"));
             Commands.ChatCommands.Add(new Command("setspawns", C3Commands.SetDuelRedSpawn, "setduelredspawn"));
             Commands.ChatCommands.Add(new Command("setspawns", C3Commands.SetTDMBlueSpawn, "settdmbluespawn"));
@@ -327,7 +328,7 @@ namespace C3Mod
         {
             lock (C3Players)
                 C3Players.Add(new C3Player(who));
-            TShock.Players[who].SendMessage("This server is running C3Mod, created by Twitchy. Donate!", Color.Cyan);
+            TShock.Players[who].SendMessage("This server is running C3Mod, created by Twitchy. Modded By RogerPaladin.", Color.Cyan);
         }
 
         public void OnUpdate(GameTime gametime)
