@@ -35,3 +35,13 @@ C:\Users\Public\Documents\C3Mod\TShockPlugins\C3Mod\bin\Debug\XNAHelpers.dll
 C:\Users\Public\Documents\C3Mod\TShockPlugins\C3Mod\obj\Debug\ResolveAssemblyReference.cache
 C:\Users\Public\Documents\C3Mod\TShockPlugins\C3Mod\obj\Debug\C3Mod Plugin.dll
 C:\Users\Public\Documents\C3Mod\TShockPlugins\C3Mod\obj\Debug\C3Mod Plugin.pdb
+D:\Project\ServerTerraria\TheTwitch-TwitchysPlugins-55e4219\TheTwitch-TwitchysPlugins-55e4219\C3Mod\obj\Debug\ResolveAssemblyReference.cache
+D:\Project\ServerTerraria\TheTwitch-TwitchysPlugins-55e4219\TheTwitch-TwitchysPlugins-55e4219\C3Mod\obj\Debug\C3Mod Plugin.dll
+D:\Project\ServerTerraria\TheTwitch-TwitchysPlugins-55e4219\TheTwitch-TwitchysPlugins-55e4219\C3Mod\bin\Debug\C3Mod Plugin.dll
+D:\Project\ServerTerraria\TheTwitch-TwitchysPlugins-55e4219\TheTwitch-TwitchysPlugins-55e4219\C3Mod\bin\Debug\C3Mod Plugin.pdb
+D:\Project\ServerTerraria\TheTwitch-TwitchysPlugins-55e4219\TheTwitch-TwitchysPlugins-55e4219\C3Mod\obj\Debug\C3Mod Plugin.pdb
+D:\Project\ServerTerraria\Test server\serverplugins\C3Mod Plugin.dll
+D:\Project\ServerTerraria\Test server\serverplugins\C3Mod Plugin.pdb
+D:\Project\ServerTerraria\Test server\PVP(Source)\C3Mod\obj\Debug\ResolveAssemblyReference.cache
+D:\Project\ServerTerraria\Test server\PVP(Source)\C3Mod\obj\Debug\C3Mod Plugin.dll
+D:\Project\ServerTerraria\Test server\PVP(Source)\C3Mod\obj\Debug\C3Mod Plugin.pdb

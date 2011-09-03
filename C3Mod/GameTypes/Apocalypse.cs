@@ -358,12 +358,12 @@ namespace C3Mod.GameTypes
             {
                 Random r = new Random();
                 int amount = r.Next(Wave * 10) + Wave * 10;
-                
+
                 for (int i = 0; i < MonstersLeft; i++)
                 {
                     int npcid = NPC.NewNPC((int)(MonsterSpawn.X * 16) - r.Next(-48, 48), (int)MonsterSpawn.Y * 16, CurMonster.type);
                     Main.npc[npcid].SetDefaults(CurMonster.name);
-                    Main.npc[npcid].life = Main.npc[npcid].life * (Wave / 3) + 1;
+                    //Main.npc[npcid].life = Main.npc[npcid].life * (Wave / 3) + 1;
                     MonsterWhoAmI.Add(Main.npc[npcid]);
                 }
             }
