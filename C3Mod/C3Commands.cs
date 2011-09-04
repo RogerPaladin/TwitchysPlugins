@@ -684,11 +684,11 @@ namespace C3Mod
                 {
                     foreach (C3Player player in C3Mod.C3Players)
                     {
-                        if (player.Team == 7)
+                        if (player.Team == 1)
                         {
                             RedTeam = string.Format("{0} {1}", RedTeam, player.PlayerName);
                         }
-                        else
+                        if (player.Team == 2)
                         {
                             BlueTeam = string.Format("{0} {1}", BlueTeam, player.PlayerName);
                         }
@@ -709,7 +709,7 @@ namespace C3Mod
                         {
                             RedTeam = string.Format("{0} {1}", RedTeam, player.PlayerName);
                         }
-                        else
+                        if (player.Team == 8)
                         {
                             BlueTeam = string.Format("{0} {1}", BlueTeam, player.PlayerName);
                         }
@@ -730,7 +730,7 @@ namespace C3Mod
                         {
                             RedTeam = string.Format("{0} {1}", RedTeam, player.PlayerName);
                         }
-                        else
+                        if (player.Team == 4)
                         {
                             BlueTeam = string.Format("{0} {1}", BlueTeam, player.PlayerName);
                         }
@@ -751,7 +751,7 @@ namespace C3Mod
                         {
                             RedTeam = string.Format("{0} {1}", RedTeam, player.PlayerName);
                         }
-                        else
+                        if (player.Team == 6)
                         {
                             BlueTeam = string.Format("{0} {1}", BlueTeam, player.PlayerName);
                         }

@@ -183,12 +183,12 @@ namespace C3Mod.GameTypes
                 if (BluePlayerScore == C3Mod.C3Config.DuelScoreLimit)
                 {
                     DuelRunning = false;
-                    TShock.Users.SetRCoins(BluePlayer.PlayerName, (BluePlayerScore * 0.2) + 0.5);
+                    TShock.Users.SetRCoins(BluePlayer.PlayerName, (BluePlayerScore * 0.2 + 0.5));
                     TShock.Users.SetRCoins(RedPlayer.PlayerName, RedPlayerScore * 0.1);
                     C3Tools.BroadcastMessageToGametype("1v1", BluePlayer.PlayerName + ": WINS!", Color.LightBlue);
-                    C3Tools.BroadcastMessageToGametype("", BluePlayer.PlayerName + ": Beat " + RedPlayer.PlayerName + " in a duel and earn " + (BluePlayerScore * 0.2) + 0.5 + "RCoins!", Color.LightBlue);
-                    RedPlayer.SendMessage("Your consolation prize is: " + RedPlayerScore * 0.1 + "RCoins!", Color.Green);
-                    BluePlayer.SendMessage("Your award is: " + RedPlayerScore * 0.2 + "RCoins!", Color.Green);
+                    C3Tools.BroadcastMessageToGametype("", BluePlayer.PlayerName + ": Beat " + RedPlayer.PlayerName + " in a duel and earn " + (BluePlayerScore * 0.2 + 0.5) + " RCoins!", Color.LightBlue);
+                    RedPlayer.SendMessage("Your consolation prize is: " + (RedPlayerScore * 0.1) + " RCoins!", Color.Green);
+                    BluePlayer.SendMessage("Your award is: " + (RedPlayerScore * 0.2) + " RCoins!", Color.Green);
                     TpToSpawns(false);
                     C3Tools.ResetGameType("1v1");
                     RedPlayer = null;
@@ -199,12 +199,12 @@ namespace C3Mod.GameTypes
                 if (RedPlayerScore == C3Mod.C3Config.DuelScoreLimit)
                 {
                     DuelRunning = false;
-                    TShock.Users.SetRCoins(RedPlayer.PlayerName, (RedPlayerScore * 0.2) + 0.5 );
+                    TShock.Users.SetRCoins(RedPlayer.PlayerName, (RedPlayerScore * 0.2 + 0.5));
                     TShock.Users.SetRCoins(BluePlayer.PlayerName, RedPlayerScore * 0.1);
                     C3Tools.BroadcastMessageToGametype("1v1", RedPlayer.PlayerName + ": WINS!", Color.OrangeRed);
-                    C3Tools.BroadcastMessageToGametype("", RedPlayer.PlayerName + ": Beat " + BluePlayer.PlayerName + " in a duel and earn " + (BluePlayerScore * 0.2) + 0.5 + "RCoins!", Color.OrangeRed);
-                    BluePlayer.SendMessage("Your consolation prize is: " + BluePlayerScore * 0.1 + "RCoins!", Color.Green);
-                    RedPlayer.SendMessage("Your award is: " + RedPlayerScore * 0.2 + "RCoins!", Color.Green);
+                    C3Tools.BroadcastMessageToGametype("", RedPlayer.PlayerName + ": Beat " + BluePlayer.PlayerName + " in a duel and earn " + (BluePlayerScore * 0.2 + 0.5) + " RCoins!", Color.OrangeRed);
+                    BluePlayer.SendMessage("Your consolation prize is: " + (BluePlayerScore * 0.1) + " RCoins!", Color.Green);
+                    RedPlayer.SendMessage("Your award is: " + (RedPlayerScore * 0.2) + " RCoins!", Color.Green);
                     TpToSpawns(false);
                     C3Tools.ResetGameType("1v1");
                     RedPlayer = null;
